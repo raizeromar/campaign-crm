@@ -15,7 +15,7 @@ class CampaignLeadInline(admin.TabularInline):
 class MessageAssignmentInline(admin.TabularInline):
     model = MessageAssignment
     extra = 0
-    fields = ('message', 'sending_at', 'responded')
+    fields = ('message', 'scheduled_at', 'responded')
 
 # Custom admin classes
 @admin.register(Product)
@@ -114,8 +114,8 @@ class LinkAdmin(admin.ModelAdmin):
 
 @admin.register(MessageAssignment)
 class MessageAssignmentAdmin(admin.ModelAdmin):
-    list_display = ('campaign_lead', 'message', 'sending_at', 'responded')
-    list_filter = ('responded', 'sending_at')
+    list_display = ('campaign_lead', 'message', 'scheduled_at', 'responded')
+    list_filter = ('responded', 'scheduled_at')
     search_fields = ('campaign_lead__lead__full_name', 'message__subject')
 
 @admin.register(CampaignStats)
