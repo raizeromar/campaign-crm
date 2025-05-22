@@ -372,6 +372,30 @@ class MessageAssignment(models.Model):
     responded = models.BooleanField(default=False)
     responded_content = models.TextField(blank=True)
 
+    def get_tracking_url(self):
+        """Get the tracking URL for this message assignment"""
+        if self.url:
+            return self.url.get_redirect_url()
+        return ""
+    
+    def get_personalized_content(self):
+        """Get the personalized message content with tracking URL"""
+        content = self.personlized_msg or self.message.content
+        
+        # Replace placeholders with actual values
+        if self.campaign_lead and self.campaign_lead.lead:
+            lead = self.campaign_lead.lead
+            content = content.replace('{first_name}', lead.first_name)
+            content = content.replace('{last_name}', lead.last_name)
+            content = content.replace('{company}', lead.company_name)
+        
+        # Replace CTA placeholder with tracking URL if available
+        if self.url:
+            tracking_url = self.get_tracking_url()
+            content = content.replace('{cta_url}', tracking_url)
+        
+        return content
+
     def __str__(self):
         return f"{self.campaign_lead} - {self.message.subject}"
 
