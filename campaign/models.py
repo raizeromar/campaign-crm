@@ -2,11 +2,8 @@ from django.db import models
 from django.utils import timezone
 import uuid
 from urllib.parse import urlparse, urlunparse, parse_qs, urlencode
-
-
-
-
-
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 class Product(models.Model):
     name = models.CharField(max_length=255)
@@ -184,6 +181,20 @@ class CampaignLead(models.Model):
 
     def __str__(self):
         return f"{self.lead} - {self.campaign.name}"
+
+    def convert(self):
+        """Mark this lead as converted"""
+        if not self.is_converted:
+            self.is_converted = True
+            self.converted_at = timezone.now()
+            self.save()
+            
+            # Update campaign stats
+            stats, created = CampaignStats.objects.get_or_create(campaign=self.campaign)
+            stats.update_from_campaign()
+            
+            return True
+        return False
 
 
 
@@ -430,6 +441,69 @@ class CampaignStats(models.Model):
     @property
     def conversion_rate(self):
         return round(self.total_conversions / self.total_leads * 100, 2) if self.total_leads else 0
+        
+    @property
+    def click_to_conversion_rate(self):
+        return round(self.total_conversions / self.total_clicks * 100, 2) if self.total_clicks else 0
+
+    def update_from_campaign(self):
+        """Update stats based on campaign data"""
+        # Count leads
+        self.total_leads = self.campaign.campaignlead_set.count()
+        
+        # Count messages sent
+        message_assignments = MessageAssignment.objects.filter(
+            campaign_lead__campaign=self.campaign,
+            sent_at__isnull=False
+        )
+        self.total_messages_sent = message_assignments.count()
+        
+        # Count clicks (from link visits)
+        links = Link.objects.filter(campaign=self.campaign)
+        self.total_clicks = sum(link.visit_count for link in links)
+        
+        # Count conversions
+        self.total_conversions = self.campaign.campaignlead_set.filter(
+            is_converted=True
+        ).count()
+        
+        # Find best performing CTA (link with most visits)
+        if links.exists():
+            self.best_cta = links.order_by('-visit_count').first()
+        
+        # Find best performing message (most clicks)
+        if message_assignments.exists():
+            # Group by message and count clicks
+            message_clicks = {}
+            for ma in message_assignments:
+                if ma.url and ma.url.visit_count > 0:
+                    message_id = ma.message_id
+                    if message_id in message_clicks:
+                        message_clicks[message_id] += ma.url.visit_count
+                    else:
+                        message_clicks[message_id] = ma.url.visit_count
+            
+            # Find message with most clicks
+            if message_clicks:
+                best_message_id = max(message_clicks, key=message_clicks.get)
+                self.best_message_id = best_message_id
+        
+        self.save()
 
     def __str__(self):
         return f"Stats for {self.campaign.name}"
+
+@receiver(post_save, sender=Link)
+def update_campaign_stats_on_link_visit(sender, instance, **kwargs):
+    """Update campaign stats when a link is visited"""
+    if instance.visit_count > 0 and instance.campaign:
+        # Get or create campaign stats
+        stats, created = CampaignStats.objects.get_or_create(campaign=instance.campaign)
+        
+        # Update stats
+        stats.update_from_campaign()
+        
+        # If this link is associated with a campaign lead, check for conversion
+        if instance.campaign_lead and instance.campaign_lead.is_converted:
+            # This could be a good place to trigger conversion tracking
+            pass
