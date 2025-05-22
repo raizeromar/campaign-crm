@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+import uuid
 
 
 
@@ -52,6 +53,8 @@ class Lead(models.Model):
     company_website = models.URLField(blank=True)
     industry = models.CharField(max_length=100, blank=True)
     employee_count = models.CharField(max_length=50, blank=True)
+
+    location= models.CharField(max_length=255, blank=True)
 
     SOURCE_CHOICES = [
         ("linkedin_scrape", "LinkedIn Scrape"),
@@ -133,22 +136,83 @@ class Message(models.Model):
 
 
 class Link(models.Model):
+    campaign = models.ForeignKey(Campaign, on_delete=models.CASCADE)
+    campaign_lead = models.ForeignKey(CampaignLead, on_delete=models.CASCADE, null=True, blank=True)
+    
+    # Base URL from product's landing page
     url = models.URLField()
-    utm_source = models.CharField(max_length=100)
-    utm_medium = models.CharField(max_length=100)
-    utm_campaign = models.CharField(max_length=100)
+    
+    # UTM parameters with defaults
+    utm_source = models.CharField(max_length=100, default="email_outreach")
+    utm_medium = models.CharField(max_length=100, default="email")
+    utm_campaign = models.CharField(max_length=100)  # Will be auto-populated from campaign.short_name
     utm_term = models.CharField(max_length=100, blank=True)
     utm_content = models.CharField(max_length=100, blank=True)
-    ref = models.CharField(max_length=50, help_text="e.g. L12 for Lead #12")
-
+    
+    # Reference code for tracking
+    ref = models.CharField(max_length=50, unique=True, blank=True, 
+                          help_text="Unique reference code for tracking")
+    
+    # Tracking
     visited_at = models.DateTimeField(null=True, blank=True)
+    visit_count = models.IntegerField(default=0)
+
+    def save(self, *args, **kwargs):
+        # Auto-populate utm_campaign from campaign short_name if not set
+        if not self.utm_campaign and self.campaign:
+            self.utm_campaign = self.campaign.short_name
+            
+        # Generate unique ref if not set
+        if not self.ref:
+            if self.campaign_lead:
+                # Base on campaign lead ID with unique suffix
+                base_ref = f"L{self.campaign_lead.lead.id}-CL{self.campaign_lead.id}-C{self.campaign.id}"
+                # Add unique suffix to prevent duplicates
+                unique_suffix = uuid.uuid4().hex[:6]
+                self.ref = f"{base_ref}-{unique_suffix}"
+            else:
+                # If no campaign lead, generate completely random ref
+                self.ref = f"R-{uuid.uuid4().hex[:10]}"
+            
+        # Auto-populate URL from product if not set
+        if not self.url and self.campaign:
+            self.url = self.campaign.product.landing_page_url
+            
+        super().save(*args, **kwargs)
+    
+    def get_redirect_url(self):
+        """Get the Django redirect URL for tracking"""
+        from django.urls import reverse
+        return reverse('redirect_and_track', kwargs={'ref_code': self.ref})
 
     def full_url(self):
-        # You can compute and return the full URL with all UTM parameters here
-        return f"{self.url}?utm_source={self.utm_source}&utm_medium={self.utm_medium}&utm_campaign={self.utm_campaign}&utm_term={self.utm_term}&utm_content={self.utm_content}&ref={self.ref}"
+        # Compute and return the full URL with all UTM parameters
+        params = {
+            'utm_source': self.utm_source,
+            'utm_medium': self.utm_medium,
+            'utm_campaign': self.utm_campaign
+        }
+        
+        # Only add non-empty parameters
+        if self.utm_term:
+            params['utm_term'] = self.utm_term
+        if self.utm_content:
+            params['utm_content'] = self.utm_content
+        if self.ref:
+            params['ref'] = self.ref
+            
+        # Build query string
+        query_string = '&'.join([f"{k}={v}" for k, v in params.items()])
+        return f"{self.url}?{query_string}"
 
+    def track_visit(self):
+        """Record a visit to this link"""
+        self.visit_count += 1
+        self.visited_at = timezone.now()
+        self.save()
 
-
+    def __str__(self):
+        return f"{self.url} - {self.ref}"
 
 
 

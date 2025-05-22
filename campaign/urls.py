@@ -1,7 +1,7 @@
 from django.urls import path
-from django.http import HttpResponse
+from . import views
 
 urlpatterns = [
-    path('', lambda request: HttpResponse("Hello World"), name='home'),
-    
+    path('redirect/<str:ref_code>/', views.redirect_and_track, name='redirect_and_track'),
+
 ]
