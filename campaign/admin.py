@@ -1,6 +1,9 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from django.db.models import Count, Sum
+from django.contrib.admin import SimpleListFilter
+from django.http import HttpResponseRedirect
+from django.contrib import messages
 from .models import (
     Product, Campaign, Lead, NewsletterSubscriber,
     CampaignLead, Message, Link, MessageAssignment, CampaignStats
@@ -16,6 +19,20 @@ class MessageAssignmentInline(admin.TabularInline):
     model = MessageAssignment
     extra = 0
     fields = ('message', 'scheduled_at', 'responded')
+
+# Custom filter for Campaign selection
+class CampaignFilter(SimpleListFilter):
+    title = 'campaign'
+    parameter_name = 'campaign'
+
+    def lookups(self, request, model_admin):
+        campaigns = Campaign.objects.all()
+        return [(c.id, c.name) for c in campaigns]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset
+        return queryset
 
 # Custom admin classes
 @admin.register(Product)
@@ -33,12 +50,16 @@ class ProductAdmin(admin.ModelAdmin):
         return "-"
     landing_page_link.short_description = 'Landing Page'
 
+
+
+
+
+
 @admin.register(Campaign)
 class CampaignAdmin(admin.ModelAdmin):
     list_display = ('name', 'product', 'start_date', 'end_date', 'is_active', 'lead_count', 'conversion_rate')
     list_filter = ('is_active', 'product', 'start_date')
     search_fields = ('name', 'short_name', 'product__name')
-    prepopulated_fields = {'short_name': ('name',)}
     inlines = [CampaignLeadInline]
     
     def lead_count(self, obj):
@@ -52,6 +73,15 @@ class CampaignAdmin(admin.ModelAdmin):
         except CampaignStats.DoesNotExist:
             return "0%"
     conversion_rate.short_description = 'Conversion'
+
+
+
+
+
+
+
+
+
 
 @admin.register(Lead)
 class LeadAdmin(admin.ModelAdmin):
@@ -73,6 +103,55 @@ class LeadAdmin(admin.ModelAdmin):
     def campaign_count(self, obj):
         return obj.campaignlead_set.count()
     campaign_count.short_description = 'Campaigns'
+    
+    def add_to_campaign(self, request, queryset):
+        # Get the campaign ID from the request
+        campaign_id = request.POST.get('campaign')
+        
+        if not campaign_id:
+            self.message_user(request, "No campaign selected", level=messages.ERROR)
+            return
+            
+        try:
+            campaign = Campaign.objects.get(id=campaign_id)
+            
+            # Count how many leads were added
+            added_count = 0
+            already_exists_count = 0
+            
+            for lead in queryset:
+                # Try to create the campaign lead, handle duplicates
+                try:
+                    CampaignLead.objects.create(campaign=campaign, lead=lead)
+                    added_count += 1
+                except Exception:  # Handle unique constraint violation
+                    already_exists_count += 1
+            
+            # Show success message
+            if added_count > 0:
+                self.message_user(
+                    request, 
+                    f"Successfully added {added_count} leads to campaign '{campaign.name}'",
+                    level=messages.SUCCESS
+                )
+            
+            if already_exists_count > 0:
+                self.message_user(
+                    request,
+                    f"{already_exists_count} leads were already in the campaign",
+                    level=messages.WARNING
+                )
+                
+        except Campaign.DoesNotExist:
+            self.message_user(request, "Selected campaign does not exist", level=messages.ERROR)
+        
+    add_to_campaign.short_description = "Add selected leads to campaign"
+    
+    def changelist_view(self, request, extra_context=None):
+        # Add campaigns to the context for the dropdown
+        extra_context = extra_context or {}
+        extra_context['campaigns'] = Campaign.objects.all()
+        return super().changelist_view(request, extra_context=extra_context)
 
 @admin.register(NewsletterSubscriber)
 class NewsletterSubscriberAdmin(admin.ModelAdmin):
@@ -88,6 +167,13 @@ class NewsletterSubscriberAdmin(admin.ModelAdmin):
         return obj.lead.email if obj.lead else "-"
     lead_email.short_description = 'Email'
 
+
+
+
+
+
+
+
 @admin.register(CampaignLead)
 class CampaignLeadAdmin(admin.ModelAdmin):
     list_display = ('lead', 'campaign', 'is_converted', 'converted_at', 'created_at')
@@ -95,9 +181,20 @@ class CampaignLeadAdmin(admin.ModelAdmin):
     search_fields = ('lead__full_name', 'lead__email', 'campaign__name')
     inlines = [MessageAssignmentInline]
 
+
+
+
+
+
+
+
+
+
+
+
 @admin.register(Message)
 class MessageAdmin(admin.ModelAdmin):
-    list_display = ('subject', 'cta', 'message_preview')
+    list_display = ('subject', 'product', 'cta', 'message_preview')
     search_fields = ('subject', 'content', 'cta')
     
     def message_preview(self, obj):
@@ -106,17 +203,45 @@ class MessageAdmin(admin.ModelAdmin):
         return obj.content
     message_preview.short_description = 'Content Preview'
 
+
+
+
+
+
+
+
+
+
 @admin.register(Link)
 class LinkAdmin(admin.ModelAdmin):
     list_display = ('url', 'utm_campaign', 'utm_source', 'utm_medium', 'ref', 'visited_at')
     list_filter = ('utm_source', 'utm_medium', 'visited_at')
     search_fields = ('url', 'utm_campaign', 'ref')
 
+
+
+
+
+
+
+
+
+
+
+
 @admin.register(MessageAssignment)
 class MessageAssignmentAdmin(admin.ModelAdmin):
     list_display = ('campaign_lead', 'message', 'scheduled_at', 'responded')
     list_filter = ('responded', 'scheduled_at')
     search_fields = ('campaign_lead__lead__full_name', 'message__subject')
+
+
+
+
+
+
+
+
 
 @admin.register(CampaignStats)
 class CampaignStatsAdmin(admin.ModelAdmin):

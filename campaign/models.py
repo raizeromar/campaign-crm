@@ -217,7 +217,7 @@ class Message(models.Model):
     pps = models.TextField(blank=True)
 
     def __str__(self):
-        return f"{self.subject} - {self.cta}"
+        return f"{self.subject}"
 
 
 
