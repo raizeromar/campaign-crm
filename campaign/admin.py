@@ -188,6 +188,7 @@ class CampaignLeadForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         lead = cleaned_data.get('lead')
+        campaign = cleaned_data.get('campaign')
         
         # Get filter values from POST data
         lead_type = self.data.get('lead_type')
@@ -205,6 +206,10 @@ class CampaignLeadForm(forms.ModelForm):
             # If no filters and no lead, raise validation error
             logger.warning("No filters and no lead, raising validation error")
             raise ValidationError({'lead': 'This field is required when not using filters.'})
+        
+        # Always require a campaign
+        if not campaign:
+            raise ValidationError({'campaign': 'This field is required.'})
         
         return cleaned_data
 
@@ -227,17 +232,18 @@ class CampaignLeadAdmin(admin.ModelAdmin):
         
         logger.warning("Rendering add_view with custom template")
         
-        # Handle POST request with filters
+        # Handle POST request
         if request.method == 'POST':
             lead_type = request.POST.get('lead_type')
             lead_source = request.POST.get('lead_source')
             campaign_id = request.POST.get('campaign')
+            lead_id = request.POST.get('lead')
             is_converted = request.POST.get('is_converted') == 'on'
             converted_at = request.POST.get('converted_at')
             
-            logger.warning(f"POST data: campaign={campaign_id}, lead_type={lead_type}, lead_source={lead_source}")
+            logger.warning(f"POST data: campaign={campaign_id}, lead_id={lead_id}, lead_type={lead_type}, lead_source={lead_source}")
             
-            # If using filters and we have a campaign
+            # Case 1: Using filters to add multiple leads
             if (lead_type or lead_source) and campaign_id:
                 # Build query based on filters
                 query = {}
@@ -294,6 +300,43 @@ class CampaignLeadAdmin(admin.ModelAdmin):
                     
                     # Redirect to the campaign lead list
                     return HttpResponseRedirect("../")
+            
+            # Case 2: Adding a single lead
+            elif campaign_id and lead_id:
+                logger.warning(f"Adding single lead: lead_id={lead_id}, campaign_id={campaign_id}")
+                try:
+                    campaign = Campaign.objects.get(id=campaign_id)
+                    lead = Lead.objects.get(id=lead_id)
+                    
+                    # Check if this lead is already in the campaign
+                    if CampaignLead.objects.filter(campaign=campaign, lead=lead).exists():
+                        messages.warning(request, f"Lead '{lead.full_name}' is already in campaign '{campaign.name}'")
+                        logger.warning(f"Lead {lead.full_name} already exists in campaign")
+                    else:
+                        # Create the campaign lead
+                        CampaignLead.objects.create(
+                            campaign=campaign,
+                            lead=lead,
+                            is_converted=is_converted,
+                            converted_at=converted_at if converted_at else None
+                        )
+                        messages.success(request, f"Successfully added lead '{lead.full_name}' to campaign '{campaign.name}'")
+                        logger.warning(f"Successfully added lead {lead.full_name} to campaign")
+                    
+                    # Redirect to the campaign lead list or to add another
+                    if '_addanother' in request.POST:
+                        return HttpResponseRedirect(".")
+                    else:
+                        return HttpResponseRedirect("../")
+                except Campaign.DoesNotExist:
+                    messages.error(request, "Selected campaign does not exist")
+                    logger.error(f"Campaign with ID {campaign_id} does not exist")
+                except Lead.DoesNotExist:
+                    messages.error(request, "Selected lead does not exist")
+                    logger.error(f"Lead with ID {lead_id} does not exist")
+                except Exception as e:
+                    messages.error(request, f"Error adding lead to campaign: {str(e)}")
+                    logger.error(f"Error adding lead to campaign: {str(e)}")
         
         return super().add_view(request, form_url, extra_context)
     
