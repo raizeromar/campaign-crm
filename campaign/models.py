@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 import uuid
+from urllib.parse import urlparse, urlunparse, parse_qs, urlencode
 
 
 
@@ -11,6 +12,49 @@ class Product(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     landing_page_url = models.URLField(blank=True)
+
+    def clean(self):
+        """Clean the model fields before validation"""
+        super().clean()
+        
+        # Clean the landing page URL
+        if self.landing_page_url:
+            self.landing_page_url = self._normalize_url(self.landing_page_url)
+    
+    def _normalize_url(self, url):
+        """Normalize URL to ensure consistent format"""
+        if not url:
+            return ""
+            
+        # Parse the URL into components
+        parsed = urlparse(url)
+        
+        # Normalize path (ensure consistent trailing slash handling)
+        path = parsed.path
+        if not path:
+            path = "/"
+        elif path != "/" and not path.endswith("/"):
+            # Add trailing slash for consistency
+            path = path + "/"
+            
+        # Rebuild the URL with normalized path
+        normalized = urlunparse((
+            parsed.scheme,
+            parsed.netloc,
+            path,
+            parsed.params,
+            parsed.query,
+            parsed.fragment  # Preserve fragment (#) if present
+        ))
+        
+        return normalized
+    
+    def save(self, *args, **kwargs):
+        # Clean the URL before saving
+        if self.landing_page_url:
+            self.landing_page_url = self._normalize_url(self.landing_page_url)
+        
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -23,11 +67,29 @@ class Product(models.Model):
 
 class Campaign(models.Model):
     name = models.CharField(max_length=255)
-    short_name = models.SlugField(unique=True)
+    short_name = models.SlugField(unique=True, blank=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     start_date = models.DateTimeField(default=timezone.now)
     end_date = models.DateTimeField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
+
+    def save(self, *args, **kwargs):
+        # Generate short_name if not provided
+        if not self.short_name:
+            # First save to get an ID if this is a new campaign
+            if not self.id:
+                super().save(*args, **kwargs)
+                
+            # Get first letter of each word in campaign name
+            name_initials = ''.join([word[0].lower() for word in self.name.split() if word])
+            
+            # Create short_name with campaign ID and initials
+            self.short_name = f"c{self.id}-{name_initials}"
+            
+            # Save again with the generated short_name
+            kwargs['force_insert'] = False
+            
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.name} - {self.product.name}"
@@ -53,6 +115,7 @@ class Lead(models.Model):
     company_website = models.URLField(blank=True)
     industry = models.CharField(max_length=100, blank=True)
     employee_count = models.CharField(max_length=50, blank=True)
+    campany_linkedin_page= models.URLField(blank=True)
 
     location= models.CharField(max_length=255, blank=True)
 
@@ -72,6 +135,21 @@ class Lead(models.Model):
     lead_type = models.CharField(max_length=20, choices=TYPE_CHOICES)
 
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        # Auto-populate first_name and last_name from full_name if not set
+        if self.full_name and (not self.first_name or not self.last_name):
+            name_parts = self.full_name.strip().split()
+            
+            if len(name_parts) > 0:
+                # First name is the first part
+                self.first_name = name_parts[0]
+                
+                # Last name is everything else (including middle names)
+                if len(name_parts) > 1:
+                    self.last_name = ' '.join(name_parts[1:])
+        
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.full_name} - {self.lead_type} -  {self.source}"
@@ -157,7 +235,39 @@ class Link(models.Model):
     visited_at = models.DateTimeField(null=True, blank=True)
     visit_count = models.IntegerField(default=0)
 
+    def clean_url(self):
+        """Normalize the URL to prevent issues with trailing slashes and fragments"""
+        if not self.url:
+            return ""
+            
+        # Parse the URL into components
+        parsed = urlparse(self.url)
+        
+        # Normalize path (ensure consistent trailing slash handling)
+        path = parsed.path
+        if not path:
+            path = "/"
+        elif path != "/" and not path.endswith("/"):
+            # Add trailing slash for consistency
+            path = path + "/"
+            
+        # Rebuild the URL with normalized path
+        normalized = urlunparse((
+            parsed.scheme,
+            parsed.netloc,
+            path,
+            parsed.params,
+            parsed.query,
+            parsed.fragment  # Preserve fragment (#) if present
+        ))
+        
+        return normalized
+    
     def save(self, *args, **kwargs):
+        # Normalize the URL before saving
+        if self.url:
+            self.url = self.clean_url()
+            
         # Auto-populate utm_campaign from campaign short_name if not set
         if not self.utm_campaign and self.campaign:
             self.utm_campaign = self.campaign.short_name
@@ -186,8 +296,18 @@ class Link(models.Model):
         return reverse('redirect_and_track', kwargs={'ref_code': self.ref})
 
     def full_url(self):
-        # Compute and return the full URL with all UTM parameters
-        params = {
+        """Get the full URL with all UTM parameters while preserving fragments"""
+        if not self.url:
+            return ""
+            
+        # Parse the base URL
+        parsed = urlparse(self.url)
+        
+        # Get existing query parameters
+        query_params = parse_qs(parsed.query)
+        
+        # Add UTM parameters
+        utm_params = {
             'utm_source': self.utm_source,
             'utm_medium': self.utm_medium,
             'utm_campaign': self.utm_campaign
@@ -195,15 +315,29 @@ class Link(models.Model):
         
         # Only add non-empty parameters
         if self.utm_term:
-            params['utm_term'] = self.utm_term
+            utm_params['utm_term'] = self.utm_term
         if self.utm_content:
-            params['utm_content'] = self.utm_content
+            utm_params['utm_content'] = self.utm_content
         if self.ref:
-            params['ref'] = self.ref
+            utm_params['ref'] = self.ref
             
-        # Build query string
-        query_string = '&'.join([f"{k}={v}" for k, v in params.items()])
-        return f"{self.url}?{query_string}"
+        # Update query parameters with UTM parameters
+        query_params.update(utm_params)
+        
+        # Convert query parameters to string
+        query_string = urlencode(query_params, doseq=True)
+        
+        # Rebuild the URL with the new query string, preserving the fragment
+        result = urlunparse((
+            parsed.scheme,
+            parsed.netloc,
+            parsed.path,
+            parsed.params,
+            query_string,
+            parsed.fragment  # Preserve fragment (#) if present
+        ))
+        
+        return result
 
     def track_visit(self):
         """Record a visit to this link"""
