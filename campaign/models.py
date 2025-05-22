@@ -226,11 +226,30 @@ class Message(models.Model):
 
 
 class Link(models.Model):
+    PURPOSE_CHOICES = [
+        ('message', 'Email Message'),
+        ('social', 'Social Media'),
+        ('manual', 'Manual Sharing'),
+        ('other', 'Other')
+    ]
+    
     campaign = models.ForeignKey(Campaign, on_delete=models.CASCADE)
     campaign_lead = models.ForeignKey(CampaignLead, on_delete=models.CASCADE, null=True, blank=True)
     
+    # Purpose of this link
+    purpose = models.CharField(
+        max_length=20, 
+        choices=PURPOSE_CHOICES,
+        default='message',
+        help_text="What this link will be used for"
+    )
+    
+    # Optional description
+    description = models.CharField(max_length=255, blank=True, help_text="Optional description of this link's purpose")
+    
     # Base URL from product's landing page
     url = models.URLField(
+        blank=True,
         help_text="Will be auto-populated from campaign's product landing page if left empty"
     )
     
@@ -239,6 +258,7 @@ class Link(models.Model):
     utm_medium = models.CharField(max_length=100, default="email")
     utm_campaign = models.CharField(
         max_length=100,
+        blank=True,
         help_text="Will be auto-populated from campaign's short_name if left empty"
     )
     utm_term = models.CharField(max_length=100, blank=True)
@@ -255,6 +275,9 @@ class Link(models.Model):
     # Tracking
     visited_at = models.DateTimeField(null=True, blank=True)
     visit_count = models.IntegerField(default=0)
+    
+    # Add created_at field
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def clean_url(self):
         """Normalize the URL to prevent issues with trailing slashes and fragments"""
@@ -371,17 +394,10 @@ class Link(models.Model):
 
 
 
-
-
-
-
-
-
-
 class MessageAssignment(models.Model):
     campaign_lead = models.ForeignKey(CampaignLead, on_delete=models.CASCADE)
     message = models.ForeignKey(Message, on_delete=models.CASCADE)
-    url = models.ForeignKey(Link, null=True, blank=True, on_delete=models.SET_NULL)
+    url = models.ForeignKey(Link, null=True, blank=True, on_delete=models.SET_NULL, related_name='message_assignments')
 
     personlized_msg = models.TextField(blank=True)
     

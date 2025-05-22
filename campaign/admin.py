@@ -216,10 +216,18 @@ class CampaignLeadForm(forms.ModelForm):
 @admin.register(CampaignLead)
 class CampaignLeadAdmin(admin.ModelAdmin):
     form = CampaignLeadForm
-    list_display = ('lead', 'campaign', 'is_converted', 'converted_at', 'created_at')
+    list_display = ('lead', 'campaign', 'is_converted', 'link_count', 'converted_at', 'created_at')
     list_filter = ('is_converted', 'campaign', 'created_at')
     search_fields = ('lead__full_name', 'lead__email', 'campaign__name')
     inlines = [MessageAssignmentInline]
+    
+    def link_count(self, obj):
+        """Count how many links this campaign lead has"""
+        count = Link.objects.filter(campaign_lead=obj).count()
+        if count > 0:
+            return format_html('<a href="/admin/campaign/link/?campaign_lead__id__exact={}">{} links</a>', obj.id, count)
+        return "0"
+    link_count.short_description = 'Links'
     
     def add_view(self, request, form_url='', extra_context=None):
         # Add lead types and sources to the context
@@ -418,9 +426,9 @@ class LinkAdminForm(forms.ModelForm):
 @admin.register(Link)
 class LinkAdmin(admin.ModelAdmin):
     form = LinkAdminForm
-    list_display = ('url', 'campaign', 'campaign_lead', 'tracking_url', 'visit_count', 'visited_at')
-    list_filter = ('campaign', 'campaign_lead', 'visit_count')
-    search_fields = ('url', 'utm_campaign', 'ref')
+    list_display = ('url', 'campaign', 'campaign_lead', 'purpose', 'tracking_url', 'message_assignments_count', 'visit_count', 'visited_at')
+    list_filter = ('campaign', 'purpose', 'visit_count')
+    search_fields = ('url', 'utm_campaign', 'ref', 'description')
     
     def tracking_url(self, obj):
         """Display the tracking URL with a copy button"""
@@ -431,6 +439,14 @@ class LinkAdmin(admin.ModelAdmin):
             return format_html('<a href="{0}" target="_blank">{0}</a>', full_url)
         return "-"
     tracking_url.short_description = 'Tracking URL'
+    
+    def message_assignments_count(self, obj):
+        """Count how many message assignments use this link"""
+        count = obj.message_assignments.count()
+        if count > 0:
+            return format_html('<a href="/admin/campaign/messageassignment/?url__id__exact={}">{} assignments</a>', obj.id, count)
+        return "0"
+    message_assignments_count.short_description = 'Used in Messages'
     
     def save_model(self, request, obj, form, change):
         create_for_all_leads = form.cleaned_data.get('create_for_all_leads')
@@ -449,6 +465,8 @@ class LinkAdmin(admin.ModelAdmin):
                     link = Link(
                         campaign=campaign,
                         campaign_lead=campaign_lead,
+                        purpose=obj.purpose,
+                        description=obj.description,
                         url=obj.url,
                         utm_source=obj.utm_source,
                         utm_medium=obj.utm_medium,
@@ -486,11 +504,24 @@ class LinkAdmin(admin.ModelAdmin):
 
 @admin.register(MessageAssignment)
 class MessageAssignmentAdmin(admin.ModelAdmin):
-    list_display = ('campaign_lead', 'message', 'scheduled_at', 'responded')
-    list_filter = ('responded', 'scheduled_at')
+    list_display = ('campaign_lead', 'message', 'link_info', 'scheduled_at', 'sent_at', 'responded')
+    list_filter = ('responded', 'scheduled_at', 'sent_at')
     search_fields = ('campaign_lead__lead__full_name', 'message__subject')
-
-
+    
+    def link_info(self, obj):
+        """Display link information if available"""
+        if obj.url:
+            visit_count = obj.url.visit_count
+            visit_text = f"{visit_count} visit{'s' if visit_count != 1 else ''}"
+            return format_html(
+                '<a href="/admin/campaign/link/{}/change/">{}</a> ({}) - <a href="{}" target="_blank">View</a>',
+                obj.url.id,
+                obj.url.ref,
+                visit_text,
+                obj.url.get_redirect_url()
+            )
+        return "No link"
+    link_info.short_description = 'Tracking Link'
 
 
 
