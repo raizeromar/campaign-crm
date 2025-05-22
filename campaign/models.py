@@ -149,7 +149,7 @@ class Lead(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.full_name} - {self.lead_type} -  {self.source}"
+        return f"{self.full_name}"
 
 
 

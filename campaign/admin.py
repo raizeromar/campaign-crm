@@ -11,6 +11,7 @@ from .models import (
     CampaignLead, Message, Link, MessageAssignment, CampaignStats
 )
 import logging
+from django.conf import settings
 
 # Configure logger
 logger = logging.getLogger(__name__)
@@ -358,9 +359,19 @@ class LinkAdminForm(forms.ModelForm):
 @admin.register(Link)
 class LinkAdmin(admin.ModelAdmin):
     form = LinkAdminForm
-    list_display = ('url', 'utm_campaign', 'utm_source', 'utm_medium', 'ref', 'visited_at')
-    list_filter = ('utm_source', 'utm_medium', 'visited_at')
+    list_display = ('url', 'campaign', 'campaign_lead', 'tracking_url', 'visit_count', 'visited_at')
+    list_filter = ('campaign', 'campaign_lead', 'visit_count')
     search_fields = ('url', 'utm_campaign', 'ref')
+    
+    def tracking_url(self, obj):
+        """Display the tracking URL with a copy button"""
+        if obj.ref:
+            from django.urls import reverse
+            tracking_url = reverse('redirect_and_track', kwargs={'ref_code': obj.ref})
+            full_url = f"{settings.SITE_URL}{tracking_url}" if hasattr(settings, 'SITE_URL') else tracking_url
+            return format_html('<a href="{0}" target="_blank">{0}</a>', full_url)
+        return "-"
+    tracking_url.short_description = 'Tracking URL'
     
     def save_model(self, request, obj, form, change):
         # Make sure the URL and utm_campaign are populated before saving

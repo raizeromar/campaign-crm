@@ -142,3 +142,9 @@ LOGGING = {
         'level': 'WARNING',
     },
 }
+
+# Site URL for generating absolute URLs
+SITE_URL = 'http://localhost:8000'  # Development URL
+
+# In production, you would set this to your actual domain
+# SITE_URL = 'https://example.com'  # Production URL
