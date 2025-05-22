@@ -230,18 +230,27 @@ class Link(models.Model):
     campaign_lead = models.ForeignKey(CampaignLead, on_delete=models.CASCADE, null=True, blank=True)
     
     # Base URL from product's landing page
-    url = models.URLField()
+    url = models.URLField(
+        help_text="Will be auto-populated from campaign's product landing page if left empty"
+    )
     
     # UTM parameters with defaults
     utm_source = models.CharField(max_length=100, default="email_outreach")
     utm_medium = models.CharField(max_length=100, default="email")
-    utm_campaign = models.CharField(max_length=100)  # Will be auto-populated from campaign.short_name
+    utm_campaign = models.CharField(
+        max_length=100,
+        help_text="Will be auto-populated from campaign's short_name if left empty"
+    )
     utm_term = models.CharField(max_length=100, blank=True)
     utm_content = models.CharField(max_length=100, blank=True)
     
     # Reference code for tracking
-    ref = models.CharField(max_length=50, unique=True, blank=True, 
-                          help_text="Unique reference code for tracking")
+    ref = models.CharField(
+        max_length=50, 
+        unique=True, 
+        blank=True, 
+        help_text="Unique reference code for tracking (auto-generated if left empty)"
+    )
     
     # Tracking
     visited_at = models.DateTimeField(null=True, blank=True)
@@ -358,7 +367,7 @@ class Link(models.Model):
         self.save()
 
     def __str__(self):
-        return f"{self.url} - {self.ref}"
+        return f"{self.ref}"
 
 
 

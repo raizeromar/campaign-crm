@@ -327,17 +327,50 @@ class MessageAdmin(admin.ModelAdmin):
 
 
 
+class LinkAdminForm(forms.ModelForm):
+    class Meta:
+        model = Link
+        fields = '__all__'
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Make URL and utm_campaign not required in the form
+        self.fields['url'].required = False
+        self.fields['utm_campaign'].required = False
+        
+        # Update help text to be more clear
+        self.fields['url'].help_text = "Will be auto-populated from campaign's product landing page if left empty"
+        self.fields['utm_campaign'].help_text = "Will be auto-populated from campaign's short_name if left empty"
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        campaign = cleaned_data.get('campaign')
+        
+        # Validate that campaign is selected if URL or utm_campaign is empty
+        if not cleaned_data.get('url') and not campaign:
+            self.add_error('campaign', 'Campaign is required when URL is not provided')
+        
+        if not cleaned_data.get('utm_campaign') and not campaign:
+            self.add_error('campaign', 'Campaign is required when UTM Campaign is not provided')
+        
+        return cleaned_data
+
 @admin.register(Link)
 class LinkAdmin(admin.ModelAdmin):
+    form = LinkAdminForm
     list_display = ('url', 'utm_campaign', 'utm_source', 'utm_medium', 'ref', 'visited_at')
     list_filter = ('utm_source', 'utm_medium', 'visited_at')
     search_fields = ('url', 'utm_campaign', 'ref')
-
-
-
-
-
-
+    
+    def save_model(self, request, obj, form, change):
+        # Make sure the URL and utm_campaign are populated before saving
+        if not obj.url and obj.campaign:
+            obj.url = obj.campaign.product.landing_page_url
+        
+        if not obj.utm_campaign and obj.campaign:
+            obj.utm_campaign = obj.campaign.short_name
+        
+        super().save_model(request, obj, form, change)
 
 
 
