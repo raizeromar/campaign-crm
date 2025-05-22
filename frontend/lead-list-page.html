@@ -1,0 +1,530 @@
+<html>
+  <head>
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
+    <link
+      rel="stylesheet"
+      as="style"
+      onload="this.rel='stylesheet'"
+      href="https://fonts.googleapis.com/css2?display=swap&amp;family=Inter%3Awght%40400%3B500%3B700%3B900&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900"
+    />
+
+    <title>Stitch Design</title>
+    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  </head>
+  <body>
+    <div class="relative flex size-full min-h-screen flex-col bg-white group/design-root overflow-x-hidden" style='font-family: Inter, "Noto Sans", sans-serif;'>
+      <div class="layout-container flex h-full grow flex-col">
+        <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f0f2f5] px-10 py-3">
+          <div class="flex items-center gap-8">
+            <div class="flex items-center gap-4 text-[#111518]">
+              <div class="size-4">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M24 45.8096C19.6865 45.8096 15.4698 44.5305 11.8832 42.134C8.29667 39.7376 5.50128 36.3314 3.85056 32.3462C2.19985 28.361 1.76794 23.9758 2.60947 19.7452C3.451 15.5145 5.52816 11.6284 8.57829 8.5783C11.6284 5.52817 15.5145 3.45101 19.7452 2.60948C23.9758 1.76795 28.361 2.19986 32.3462 3.85057C36.3314 5.50129 39.7376 8.29668 42.134 11.8833C44.5305 15.4698 45.8096 19.6865 45.8096 24L24 24L24 45.8096Z"
+                    fill="currentColor"
+                  ></path>
+                </svg>
+              </div>
+              <h2 class="text-[#111518] text-lg font-bold leading-tight tracking-[-0.015em]">ConnectFlow</h2>
+            </div>
+            <div class="flex items-center gap-9">
+              <a class="text-[#111518] text-sm font-medium leading-normal" href="#">Dashboard</a>
+              <a class="text-[#111518] text-sm font-medium leading-normal" href="#">Campaigns</a>
+              <a class="text-[#111518] text-sm font-medium leading-normal" href="#">Automations</a>
+              <a class="text-[#111518] text-sm font-medium leading-normal" href="#">Contacts</a>
+              <a class="text-[#111518] text-sm font-medium leading-normal" href="#">Reports</a>
+            </div>
+          </div>
+          <div class="flex flex-1 justify-end gap-8">
+            <label class="flex flex-col min-w-40 !h-10 max-w-64">
+              <div class="flex w-full flex-1 items-stretch rounded-xl h-full">
+                <div
+                  class="text-[#60768a] flex border-none bg-[#f0f2f5] items-center justify-center pl-4 rounded-l-xl border-r-0"
+                  data-icon="MagnifyingGlass"
+                  data-size="24px"
+                  data-weight="regular"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                    <path
+                      d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"
+                    ></path>
+                  </svg>
+                </div>
+                <input
+                  placeholder="Search"
+                  class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#111518] focus:outline-0 focus:ring-0 border-none bg-[#f0f2f5] focus:border-none h-full placeholder:text-[#60768a] px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal"
+                  value=""
+                />
+              </div>
+            </label>
+            <button
+              class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 bg-[#f0f2f5] text-[#111518] gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5"
+            >
+              <div class="text-[#111518]" data-icon="Bell" data-size="20px" data-weight="regular">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
+                  <path
+                    d="M221.8,175.94C216.25,166.38,208,139.33,208,104a80,80,0,1,0-160,0c0,35.34-8.26,62.38-13.81,71.94A16,16,0,0,0,48,200H88.81a40,40,0,0,0,78.38,0H208a16,16,0,0,0,13.8-24.06ZM128,216a24,24,0,0,1-22.62-16h45.24A24,24,0,0,1,128,216ZM48,184c7.7-13.24,16-43.92,16-80a64,64,0,1,1,128,0c0,36.05,8.28,66.73,16,80Z"
+                  ></path>
+                </svg>
+              </div>
+            </button>
+            <div
+              class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
+              style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBnDlfbEDcRuzyMgjZTnMxNgVSHKVyZpoc4aiAMemfJhDKX9X9q8c3_VPwvbIwpGxDZ-FWm7YEqeza7XJvsGfML-DMldbn3spb8D_nxHgCIuwCzGJDe1EfOjvJspvbecbIYu4vR4bHCgirMjr2j2Cpl3FtdNFv4RWrtmN6GOaRAFU53jhMgGQ9KY20lTWksLwAYY6SbZKABaqiL6ZKYYGjLTAmW-YtUm37bntt9UWIk007-H-3EaXhaRsC1oqqkmZic_eVilzGBp-c");'
+            ></div>
+          </div>
+        </header>
+        <div class="px-40 flex flex-1 justify-center py-5">
+          <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
+            <div class="flex flex-wrap justify-between gap-3 p-4">
+              <p class="text-[#111518] tracking-light text-[32px] font-bold leading-tight min-w-72">Leads</p>
+              <button
+                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-8 px-4 bg-[#f0f2f5] text-[#111518] text-sm font-medium leading-normal"
+              >
+                <span class="truncate">Add New Lead</span>
+              </button>
+            </div>
+            <div class="px-4 py-3">
+              <label class="flex flex-col min-w-40 h-12 w-full">
+                <div class="flex w-full flex-1 items-stretch rounded-xl h-full">
+                  <div
+                    class="text-[#60768a] flex border-none bg-[#f0f2f5] items-center justify-center pl-4 rounded-l-xl border-r-0"
+                    data-icon="MagnifyingGlass"
+                    data-size="24px"
+                    data-weight="regular"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                      <path
+                        d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"
+                      ></path>
+                    </svg>
+                  </div>
+                  <input
+                    placeholder="Search by Name, Email, or Company"
+                    class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#111518] focus:outline-0 focus:ring-0 border-none bg-[#f0f2f5] focus:border-none h-full placeholder:text-[#60768a] px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal"
+                    value=""
+                  />
+                </div>
+              </label>
+            </div>
+            <div class="flex gap-3 p-3 flex-wrap pr-4">
+              <button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-[#f0f2f5] pl-4 pr-2">
+                <p class="text-[#111518] text-sm font-medium leading-normal">Source</p>
+                <div class="text-[#111518]" data-icon="CaretDown" data-size="20px" data-weight="regular">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
+                    <path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"></path>
+                  </svg>
+                </div>
+              </button>
+              <button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-[#f0f2f5] pl-4 pr-2">
+                <p class="text-[#111518] text-sm font-medium leading-normal">Lead Type</p>
+                <div class="text-[#111518]" data-icon="CaretDown" data-size="20px" data-weight="regular">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
+                    <path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"></path>
+                  </svg>
+                </div>
+              </button>
+              <button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-[#f0f2f5] pl-4 pr-2">
+                <p class="text-[#111518] text-sm font-medium leading-normal">Industry</p>
+                <div class="text-[#111518]" data-icon="CaretDown" data-size="20px" data-weight="regular">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
+                    <path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"></path>
+                  </svg>
+                </div>
+              </button>
+            </div>
+            <div class="flex px-4 py-3 justify-start">
+              <button
+                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#f0f2f5] text-[#111518] text-sm font-bold leading-normal tracking-[0.015em]"
+              >
+                <span class="truncate">Clear All Filters</span>
+              </button>
+            </div>
+            <p class="text-[#60768a] text-sm font-normal leading-normal pb-3 pt-1 px-4">Showing 1-10 of 125 leads</p>
+            <div class="px-4 py-3 @container">
+              <div class="flex overflow-hidden rounded-xl border border-[#dbe1e6] bg-white">
+                <table class="flex-1">
+                  <thead>
+                    <tr class="bg-white">
+                      <th class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-120 px-4 py-3 text-left text-[#111518] text-sm font-medium leading-normal">Select</th>
+                      <th class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-240 px-4 py-3 text-left text-[#111518] w-[400px] text-sm font-medium leading-normal">
+                        Full Name
+                      </th>
+                      <th class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-360 px-4 py-3 text-left text-[#111518] w-[400px] text-sm font-medium leading-normal">Email</th>
+                      <th class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-480 px-4 py-3 text-left text-[#111518] w-[400px] text-sm font-medium leading-normal">
+                        Company Name
+                      </th>
+                      <th class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-600 px-4 py-3 text-left text-[#111518] w-60 text-sm font-medium leading-normal">Source</th>
+                      <th class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-720 px-4 py-3 text-left text-[#111518] w-60 text-sm font-medium leading-normal">Lead Type</th>
+                      <th class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-840 px-4 py-3 text-left text-[#111518] w-[400px] text-sm font-medium leading-normal">
+                        Created At
+                      </th>
+                      <th class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-960 px-4 py-3 text-left text-[#111518] w-60 text-[#60768a] text-sm font-medium leading-normal">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="border-t border-t-[#dbe1e6]">
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-120 h-[72px] px-4 py-2 text-sm font-normal leading-normal">checkbox</td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-240 h-[72px] px-4 py-2 w-[400px] text-[#111518] text-sm font-normal leading-normal">
+                        Owen Bennett
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-360 h-[72px] px-4 py-2 w-[400px] text-[#60768a] text-sm font-normal leading-normal">
+                        owen.bennett@example.com
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-480 h-[72px] px-4 py-2 w-[400px] text-[#60768a] text-sm font-normal leading-normal">
+                        Tech Innovators Inc.
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-600 h-[72px] px-4 py-2 w-60 text-sm font-normal leading-normal">
+                        <button
+                          class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-8 px-4 bg-[#f0f2f5] text-[#111518] text-sm font-medium leading-normal w-full"
+                        >
+                          <span class="truncate">Website</span>
+                        </button>
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-720 h-[72px] px-4 py-2 w-60 text-sm font-normal leading-normal">
+                        <button
+                          class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-8 px-4 bg-[#f0f2f5] text-[#111518] text-sm font-medium leading-normal w-full"
+                        >
+                          <span class="truncate">Marketing Qualified Lead</span>
+                        </button>
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-840 h-[72px] px-4 py-2 w-[400px] text-[#60768a] text-sm font-normal leading-normal">
+                        Jan 15, 2024
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-960 h-[72px] px-4 py-2 w-60 text-[#60768a] text-sm font-bold leading-normal tracking-[0.015em]">
+                        View Detail, Edit, Delete, Add to Campaign
+                      </td>
+                    </tr>
+                    <tr class="border-t border-t-[#dbe1e6]">
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-120 h-[72px] px-4 py-2 text-sm font-normal leading-normal">checkbox</td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-240 h-[72px] px-4 py-2 w-[400px] text-[#111518] text-sm font-normal leading-normal">
+                        Sophia Carter
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-360 h-[72px] px-4 py-2 w-[400px] text-[#60768a] text-sm font-normal leading-normal">
+                        sophia.carter@example.com
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-480 h-[72px] px-4 py-2 w-[400px] text-[#60768a] text-sm font-normal leading-normal">
+                        Global Solutions Ltd.
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-600 h-[72px] px-4 py-2 w-60 text-sm font-normal leading-normal">
+                        <button
+                          class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-8 px-4 bg-[#f0f2f5] text-[#111518] text-sm font-medium leading-normal w-full"
+                        >
+                          <span class="truncate">Referral</span>
+                        </button>
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-720 h-[72px] px-4 py-2 w-60 text-sm font-normal leading-normal">
+                        <button
+                          class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-8 px-4 bg-[#f0f2f5] text-[#111518] text-sm font-medium leading-normal w-full"
+                        >
+                          <span class="truncate">Sales Qualified Lead</span>
+                        </button>
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-840 h-[72px] px-4 py-2 w-[400px] text-[#60768a] text-sm font-normal leading-normal">
+                        Feb 20, 2024
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-960 h-[72px] px-4 py-2 w-60 text-[#60768a] text-sm font-bold leading-normal tracking-[0.015em]">
+                        View Detail, Edit, Delete, Add to Campaign
+                      </td>
+                    </tr>
+                    <tr class="border-t border-t-[#dbe1e6]">
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-120 h-[72px] px-4 py-2 text-sm font-normal leading-normal">checkbox</td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-240 h-[72px] px-4 py-2 w-[400px] text-[#111518] text-sm font-normal leading-normal">
+                        Lucas Hayes
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-360 h-[72px] px-4 py-2 w-[400px] text-[#60768a] text-sm font-normal leading-normal">
+                        lucas.hayes@example.com
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-480 h-[72px] px-4 py-2 w-[400px] text-[#60768a] text-sm font-normal leading-normal">
+                        Digital Dynamics Corp.
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-600 h-[72px] px-4 py-2 w-60 text-sm font-normal leading-normal">
+                        <button
+                          class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-8 px-4 bg-[#f0f2f5] text-[#111518] text-sm font-medium leading-normal w-full"
+                        >
+                          <span class="truncate">Social Media</span>
+                        </button>
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-720 h-[72px] px-4 py-2 w-60 text-sm font-normal leading-normal">
+                        <button
+                          class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-8 px-4 bg-[#f0f2f5] text-[#111518] text-sm font-medium leading-normal w-full"
+                        >
+                          <span class="truncate">Product Qualified Lead</span>
+                        </button>
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-840 h-[72px] px-4 py-2 w-[400px] text-[#60768a] text-sm font-normal leading-normal">
+                        Mar 10, 2024
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-960 h-[72px] px-4 py-2 w-60 text-[#60768a] text-sm font-bold leading-normal tracking-[0.015em]">
+                        View Detail, Edit, Delete, Add to Campaign
+                      </td>
+                    </tr>
+                    <tr class="border-t border-t-[#dbe1e6]">
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-120 h-[72px] px-4 py-2 text-sm font-normal leading-normal">checkbox</td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-240 h-[72px] px-4 py-2 w-[400px] text-[#111518] text-sm font-normal leading-normal">
+                        Ava Foster
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-360 h-[72px] px-4 py-2 w-[400px] text-[#60768a] text-sm font-normal leading-normal">
+                        ava.foster@example.com
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-480 h-[72px] px-4 py-2 w-[400px] text-[#60768a] text-sm font-normal leading-normal">
+                        Innovative Systems LLC
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-600 h-[72px] px-4 py-2 w-60 text-sm font-normal leading-normal">
+                        <button
+                          class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-8 px-4 bg-[#f0f2f5] text-[#111518] text-sm font-medium leading-normal w-full"
+                        >
+                          <span class="truncate">Email Campaign</span>
+                        </button>
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-720 h-[72px] px-4 py-2 w-60 text-sm font-normal leading-normal">
+                        <button
+                          class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-8 px-4 bg-[#f0f2f5] text-[#111518] text-sm font-medium leading-normal w-full"
+                        >
+                          <span class="truncate">Service Qualified Lead</span>
+                        </button>
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-840 h-[72px] px-4 py-2 w-[400px] text-[#60768a] text-sm font-normal leading-normal">
+                        Apr 5, 2024
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-960 h-[72px] px-4 py-2 w-60 text-[#60768a] text-sm font-bold leading-normal tracking-[0.015em]">
+                        View Detail, Edit, Delete, Add to Campaign
+                      </td>
+                    </tr>
+                    <tr class="border-t border-t-[#dbe1e6]">
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-120 h-[72px] px-4 py-2 text-sm font-normal leading-normal">checkbox</td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-240 h-[72px] px-4 py-2 w-[400px] text-[#111518] text-sm font-normal leading-normal">
+                        Liam Mitchell
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-360 h-[72px] px-4 py-2 w-[400px] text-[#60768a] text-sm font-normal leading-normal">
+                        liam.mitchell@example.com
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-480 h-[72px] px-4 py-2 w-[400px] text-[#60768a] text-sm font-normal leading-normal">
+                        Strategic Ventures Group
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-600 h-[72px] px-4 py-2 w-60 text-sm font-normal leading-normal">
+                        <button
+                          class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-8 px-4 bg-[#f0f2f5] text-[#111518] text-sm font-medium leading-normal w-full"
+                        >
+                          <span class="truncate">Content Marketing</span>
+                        </button>
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-720 h-[72px] px-4 py-2 w-60 text-sm font-normal leading-normal">
+                        <button
+                          class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-8 px-4 bg-[#f0f2f5] text-[#111518] text-sm font-medium leading-normal w-full"
+                        >
+                          <span class="truncate">Marketing Qualified Lead</span>
+                        </button>
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-840 h-[72px] px-4 py-2 w-[400px] text-[#60768a] text-sm font-normal leading-normal">
+                        May 12, 2024
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-960 h-[72px] px-4 py-2 w-60 text-[#60768a] text-sm font-bold leading-normal tracking-[0.015em]">
+                        View Detail, Edit, Delete, Add to Campaign
+                      </td>
+                    </tr>
+                    <tr class="border-t border-t-[#dbe1e6]">
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-120 h-[72px] px-4 py-2 text-sm font-normal leading-normal">checkbox</td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-240 h-[72px] px-4 py-2 w-[400px] text-[#111518] text-sm font-normal leading-normal">
+                        Isabella Parker
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-360 h-[72px] px-4 py-2 w-[400px] text-[#60768a] text-sm font-normal leading-normal">
+                        isabella.parker@example.com
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-480 h-[72px] px-4 py-2 w-[400px] text-[#60768a] text-sm font-normal leading-normal">
+                        Advanced Tech Solutions
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-600 h-[72px] px-4 py-2 w-60 text-sm font-normal leading-normal">
+                        <button
+                          class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-8 px-4 bg-[#f0f2f5] text-[#111518] text-sm font-medium leading-normal w-full"
+                        >
+                          <span class="truncate">Webinar</span>
+                        </button>
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-720 h-[72px] px-4 py-2 w-60 text-sm font-normal leading-normal">
+                        <button
+                          class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-8 px-4 bg-[#f0f2f5] text-[#111518] text-sm font-medium leading-normal w-full"
+                        >
+                          <span class="truncate">Sales Qualified Lead</span>
+                        </button>
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-840 h-[72px] px-4 py-2 w-[400px] text-[#60768a] text-sm font-normal leading-normal">
+                        Jun 18, 2024
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-960 h-[72px] px-4 py-2 w-60 text-[#60768a] text-sm font-bold leading-normal tracking-[0.015em]">
+                        View Detail, Edit, Delete, Add to Campaign
+                      </td>
+                    </tr>
+                    <tr class="border-t border-t-[#dbe1e6]">
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-120 h-[72px] px-4 py-2 text-sm font-normal leading-normal">checkbox</td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-240 h-[72px] px-4 py-2 w-[400px] text-[#111518] text-sm font-normal leading-normal">
+                        Jackson Reynolds
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-360 h-[72px] px-4 py-2 w-[400px] text-[#60768a] text-sm font-normal leading-normal">
+                        jackson.reynolds@example.com
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-480 h-[72px] px-4 py-2 w-[400px] text-[#60768a] text-sm font-normal leading-normal">
+                        Future Forward Enterprises
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-600 h-[72px] px-4 py-2 w-60 text-sm font-normal leading-normal">
+                        <button
+                          class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-8 px-4 bg-[#f0f2f5] text-[#111518] text-sm font-medium leading-normal w-full"
+                        >
+                          <span class="truncate">Paid Ads</span>
+                        </button>
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-720 h-[72px] px-4 py-2 w-60 text-sm font-normal leading-normal">
+                        <button
+                          class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-8 px-4 bg-[#f0f2f5] text-[#111518] text-sm font-medium leading-normal w-full"
+                        >
+                          <span class="truncate">Product Qualified Lead</span>
+                        </button>
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-840 h-[72px] px-4 py-2 w-[400px] text-[#60768a] text-sm font-normal leading-normal">
+                        Jul 22, 2024
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-960 h-[72px] px-4 py-2 w-60 text-[#60768a] text-sm font-bold leading-normal tracking-[0.015em]">
+                        View Detail, Edit, Delete, Add to Campaign
+                      </td>
+                    </tr>
+                    <tr class="border-t border-t-[#dbe1e6]">
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-120 h-[72px] px-4 py-2 text-sm font-normal leading-normal">checkbox</td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-240 h-[72px] px-4 py-2 w-[400px] text-[#111518] text-sm font-normal leading-normal">
+                        Chloe Morgan
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-360 h-[72px] px-4 py-2 w-[400px] text-[#60768a] text-sm font-normal leading-normal">
+                        chloe.morgan@example.com
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-480 h-[72px] px-4 py-2 w-[400px] text-[#60768a] text-sm font-normal leading-normal">
+                        NextGen Innovations Co.
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-600 h-[72px] px-4 py-2 w-60 text-sm font-normal leading-normal">
+                        <button
+                          class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-8 px-4 bg-[#f0f2f5] text-[#111518] text-sm font-medium leading-normal w-full"
+                        >
+                          <span class="truncate">Trade Show</span>
+                        </button>
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-720 h-[72px] px-4 py-2 w-60 text-sm font-normal leading-normal">
+                        <button
+                          class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-8 px-4 bg-[#f0f2f5] text-[#111518] text-sm font-medium leading-normal w-full"
+                        >
+                          <span class="truncate">Service Qualified Lead</span>
+                        </button>
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-840 h-[72px] px-4 py-2 w-[400px] text-[#60768a] text-sm font-normal leading-normal">
+                        Aug 30, 2024
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-960 h-[72px] px-4 py-2 w-60 text-[#60768a] text-sm font-bold leading-normal tracking-[0.015em]">
+                        View Detail, Edit, Delete, Add to Campaign
+                      </td>
+                    </tr>
+                    <tr class="border-t border-t-[#dbe1e6]">
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-120 h-[72px] px-4 py-2 text-sm font-normal leading-normal">checkbox</td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-240 h-[72px] px-4 py-2 w-[400px] text-[#111518] text-sm font-normal leading-normal">
+                        Aiden Sullivan
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-360 h-[72px] px-4 py-2 w-[400px] text-[#60768a] text-sm font-normal leading-normal">
+                        aiden.sullivan@example.com
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-480 h-[72px] px-4 py-2 w-[400px] text-[#60768a] text-sm font-normal leading-normal">
+                        Pinnacle Growth Partners
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-600 h-[72px] px-4 py-2 w-60 text-sm font-normal leading-normal">
+                        <button
+                          class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-8 px-4 bg-[#f0f2f5] text-[#111518] text-sm font-medium leading-normal w-full"
+                        >
+                          <span class="truncate">Direct Mail</span>
+                        </button>
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-720 h-[72px] px-4 py-2 w-60 text-sm font-normal leading-normal">
+                        <button
+                          class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-8 px-4 bg-[#f0f2f5] text-[#111518] text-sm font-medium leading-normal w-full"
+                        >
+                          <span class="truncate">Marketing Qualified Lead</span>
+                        </button>
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-840 h-[72px] px-4 py-2 w-[400px] text-[#60768a] text-sm font-normal leading-normal">
+                        Sep 15, 2024
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-960 h-[72px] px-4 py-2 w-60 text-[#60768a] text-sm font-bold leading-normal tracking-[0.015em]">
+                        View Detail, Edit, Delete, Add to Campaign
+                      </td>
+                    </tr>
+                    <tr class="border-t border-t-[#dbe1e6]">
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-120 h-[72px] px-4 py-2 text-sm font-normal leading-normal">checkbox</td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-240 h-[72px] px-4 py-2 w-[400px] text-[#111518] text-sm font-normal leading-normal">
+                        Ethan Harper
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-360 h-[72px] px-4 py-2 w-[400px] text-[#60768a] text-sm font-normal leading-normal">
+                        ethan.harper@example.com
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-480 h-[72px] px-4 py-2 w-[400px] text-[#60768a] text-sm font-normal leading-normal">
+                        Summit Achievement Corp.
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-600 h-[72px] px-4 py-2 w-60 text-sm font-normal leading-normal">
+                        <button
+                          class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-8 px-4 bg-[#f0f2f5] text-[#111518] text-sm font-medium leading-normal w-full"
+                        >
+                          <span class="truncate">Cold Call</span>
+                        </button>
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-720 h-[72px] px-4 py-2 w-60 text-sm font-normal leading-normal">
+                        <button
+                          class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-8 px-4 bg-[#f0f2f5] text-[#111518] text-sm font-medium leading-normal w-full"
+                        >
+                          <span class="truncate">Sales Qualified Lead</span>
+                        </button>
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-840 h-[72px] px-4 py-2 w-[400px] text-[#60768a] text-sm font-normal leading-normal">
+                        Oct 20, 2024
+                      </td>
+                      <td class="table-fec96dc8-c519-439f-93bb-50abaaefb224-column-960 h-[72px] px-4 py-2 w-60 text-[#60768a] text-sm font-bold leading-normal tracking-[0.015em]">
+                        View Detail, Edit, Delete, Add to Campaign
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <style>
+                          @container(max-width:120px){.table-fec96dc8-c519-439f-93bb-50abaaefb224-column-120{display: none;}}
+                @container(max-width:240px){.table-fec96dc8-c519-439f-93bb-50abaaefb224-column-240{display: none;}}
+                @container(max-width:360px){.table-fec96dc8-c519-439f-93bb-50abaaefb224-column-360{display: none;}}
+                @container(max-width:480px){.table-fec96dc8-c519-439f-93bb-50abaaefb224-column-480{display: none;}}
+                @container(max-width:600px){.table-fec96dc8-c519-439f-93bb-50abaaefb224-column-600{display: none;}}
+                @container(max-width:720px){.table-fec96dc8-c519-439f-93bb-50abaaefb224-column-720{display: none;}}
+                @container(max-width:840px){.table-fec96dc8-c519-439f-93bb-50abaaefb224-column-840{display: none;}}
+                @container(max-width:960px){.table-fec96dc8-c519-439f-93bb-50abaaefb224-column-960{display: none;}}
+              </style>
+            </div>
+            <div class="flex items-center justify-center p-4">
+              <a href="#" class="flex size-10 items-center justify-center">
+                <div class="text-[#111518]" data-icon="CaretLeft" data-size="18px" data-weight="regular">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" fill="currentColor" viewBox="0 0 256 256">
+                    <path d="M165.66,202.34a8,8,0,0,1-11.32,11.32l-80-80a8,8,0,0,1,0-11.32l80-80a8,8,0,0,1,11.32,11.32L91.31,128Z"></path>
+                  </svg>
+                </div>
+              </a>
+              <a class="text-sm font-bold leading-normal tracking-[0.015em] flex size-10 items-center justify-center text-[#111518] rounded-full bg-[#f0f2f5]" href="#">1</a>
+              <a class="text-sm font-normal leading-normal flex size-10 items-center justify-center text-[#111518] rounded-full" href="#">2</a>
+              <a class="text-sm font-normal leading-normal flex size-10 items-center justify-center text-[#111518] rounded-full" href="#">3</a>
+              <a class="text-sm font-normal leading-normal flex size-10 items-center justify-center text-[#111518] rounded-full" href="#">4</a>
+              <a class="text-sm font-normal leading-normal flex size-10 items-center justify-center text-[#111518] rounded-full" href="#">5</a>
+              <a href="#" class="flex size-10 items-center justify-center">
+                <div class="text-[#111518]" data-icon="CaretRight" data-size="18px" data-weight="regular">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" fill="currentColor" viewBox="0 0 256 256">
+                    <path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"></path>
+                  </svg>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

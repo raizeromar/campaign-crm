@@ -1,0 +1,150 @@
+<html>
+  <head>
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
+    <link
+      rel="stylesheet"
+      as="style"
+      onload="this.rel='stylesheet'"
+      href="https://fonts.googleapis.com/css2?display=swap&amp;family=Inter%3Awght%40400%3B500%3B700%3B900&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900"
+    />
+
+    <title>Stitch Design</title>
+    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  </head>
+  <body>
+    <div class="relative flex size-full min-h-screen flex-col bg-white group/design-root overflow-x-hidden" style='font-family: Inter, "Noto Sans", sans-serif;'>
+      <div class="layout-container flex h-full grow flex-col">
+        <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f1f2f4] px-10 py-3">
+          <div class="flex items-center gap-4 text-[#121417]">
+            <div class="size-4">
+              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M4 42.4379C4 42.4379 14.0962 36.0744 24 41.1692C35.0664 46.8624 44 42.2078 44 42.2078L44 7.01134C44 7.01134 35.068 11.6577 24.0031 5.96913C14.0971 0.876274 4 7.27094 4 7.27094L4 42.4379Z"
+                  fill="currentColor"
+                ></path>
+              </svg>
+            </div>
+            <h2 class="text-[#121417] text-lg font-bold leading-tight tracking-[-0.015em]">Campaign Automator</h2>
+          </div>
+          <div class="flex flex-1 justify-end gap-8">
+            <div class="flex items-center gap-9">
+              <a class="text-[#121417] text-sm font-medium leading-normal" href="#">Dashboard</a>
+              <a class="text-[#121417] text-sm font-medium leading-normal" href="#">Campaigns</a>
+              <a class="text-[#121417] text-sm font-medium leading-normal" href="#">Products</a>
+              <a class="text-[#121417] text-sm font-medium leading-normal" href="#">Audiences</a>
+              <a class="text-[#121417] text-sm font-medium leading-normal" href="#">Reports</a>
+            </div>
+            <button
+              class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 bg-[#f1f2f4] text-[#121417] gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5"
+            >
+              <div class="text-[#121417]" data-icon="Question" data-size="20px" data-weight="regular">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
+                  <path
+                    d="M140,180a12,12,0,1,1-12-12A12,12,0,0,1,140,180ZM128,72c-22.06,0-40,16.15-40,36v4a8,8,0,0,0,16,0v-4c0-11,10.77-20,24-20s24,9,24,20-10.77,20-24,20a8,8,0,0,0-8,8v8a8,8,0,0,0,16,0v-.72c18.24-3.35,32-17.9,32-35.28C168,88.15,150.06,72,128,72Zm104,56A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"
+                  ></path>
+                </svg>
+              </div>
+            </button>
+            <div
+              class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
+              style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA-fhaAmlHJE1eTq-VaBedyA4lEA0dihhRrrBFoPf1epYmeF6wPHBvIleyelmv6W9y6cHplH6zQ71M5n23Pd3E5klvvfOOjjJSO4kGq1rVWxPsZ_LK4FLxwn2j5UOYa3ZJ_lsk6PjekYfto2WqSXfVhtG6FM5w4vl-UCC3muCfxhl4nKFSLQ__mTEoiFuI3MkWQZQHTv5qre3gE9ju3PheSA3CeKPe0ucNTVH2sbP4gykb-YEqhQq6azEXdPgqKDhmPjH4JOmjWEU0");'
+            ></div>
+          </div>
+        </header>
+        <div class="px-40 flex flex-1 justify-center py-5">
+          <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
+            <div class="flex flex-wrap justify-between gap-3 p-4">
+              <p class="text-[#121417] tracking-light text-[32px] font-bold leading-tight min-w-72">Products</p>
+              <button
+                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-8 px-4 bg-[#f1f2f4] text-[#121417] text-sm font-medium leading-normal"
+              >
+                <span class="truncate">Add New Product</span>
+              </button>
+            </div>
+            <div class="px-4 py-3 @container">
+              <div class="flex overflow-hidden rounded-xl border border-[#dde1e4] bg-white">
+                <table class="flex-1">
+                  <thead>
+                    <tr class="bg-white">
+                      <th class="table-9d0d70e4-a03b-45e3-8a83-fcf856820aab-column-120 px-4 py-3 text-left text-[#121417] w-[400px] text-sm font-medium leading-normal">Name</th>
+                      <th class="table-9d0d70e4-a03b-45e3-8a83-fcf856820aab-column-240 px-4 py-3 text-left text-[#121417] w-[400px] text-sm font-medium leading-normal">
+                        Description
+                      </th>
+                      <th class="table-9d0d70e4-a03b-45e3-8a83-fcf856820aab-column-360 px-4 py-3 text-left text-[#121417] w-[400px] text-sm font-medium leading-normal">
+                        Features
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="border-t border-t-[#dde1e4]">
+                      <td class="table-9d0d70e4-a03b-45e3-8a83-fcf856820aab-column-120 h-[72px] px-4 py-2 w-[400px] text-[#121417] text-sm font-normal leading-normal">
+                        Product A
+                      </td>
+                      <td class="table-9d0d70e4-a03b-45e3-8a83-fcf856820aab-column-240 h-[72px] px-4 py-2 w-[400px] text-[#687682] text-sm font-normal leading-normal">
+                        Description of Product A
+                      </td>
+                      <td class="table-9d0d70e4-a03b-45e3-8a83-fcf856820aab-column-360 h-[72px] px-4 py-2 w-[400px] text-[#687682] text-sm font-normal leading-normal">
+                        Feature 1, Feature 2
+                      </td>
+                    </tr>
+                    <tr class="border-t border-t-[#dde1e4]">
+                      <td class="table-9d0d70e4-a03b-45e3-8a83-fcf856820aab-column-120 h-[72px] px-4 py-2 w-[400px] text-[#121417] text-sm font-normal leading-normal">
+                        Product B
+                      </td>
+                      <td class="table-9d0d70e4-a03b-45e3-8a83-fcf856820aab-column-240 h-[72px] px-4 py-2 w-[400px] text-[#687682] text-sm font-normal leading-normal">
+                        Description of Product B
+                      </td>
+                      <td class="table-9d0d70e4-a03b-45e3-8a83-fcf856820aab-column-360 h-[72px] px-4 py-2 w-[400px] text-[#687682] text-sm font-normal leading-normal">
+                        Feature 3, Feature 4
+                      </td>
+                    </tr>
+                    <tr class="border-t border-t-[#dde1e4]">
+                      <td class="table-9d0d70e4-a03b-45e3-8a83-fcf856820aab-column-120 h-[72px] px-4 py-2 w-[400px] text-[#121417] text-sm font-normal leading-normal">
+                        Product C
+                      </td>
+                      <td class="table-9d0d70e4-a03b-45e3-8a83-fcf856820aab-column-240 h-[72px] px-4 py-2 w-[400px] text-[#687682] text-sm font-normal leading-normal">
+                        Description of Product C
+                      </td>
+                      <td class="table-9d0d70e4-a03b-45e3-8a83-fcf856820aab-column-360 h-[72px] px-4 py-2 w-[400px] text-[#687682] text-sm font-normal leading-normal">
+                        Feature 5, Feature 6
+                      </td>
+                    </tr>
+                    <tr class="border-t border-t-[#dde1e4]">
+                      <td class="table-9d0d70e4-a03b-45e3-8a83-fcf856820aab-column-120 h-[72px] px-4 py-2 w-[400px] text-[#121417] text-sm font-normal leading-normal">
+                        Product D
+                      </td>
+                      <td class="table-9d0d70e4-a03b-45e3-8a83-fcf856820aab-column-240 h-[72px] px-4 py-2 w-[400px] text-[#687682] text-sm font-normal leading-normal">
+                        Description of Product D
+                      </td>
+                      <td class="table-9d0d70e4-a03b-45e3-8a83-fcf856820aab-column-360 h-[72px] px-4 py-2 w-[400px] text-[#687682] text-sm font-normal leading-normal">
+                        Feature 7, Feature 8
+                      </td>
+                    </tr>
+                    <tr class="border-t border-t-[#dde1e4]">
+                      <td class="table-9d0d70e4-a03b-45e3-8a83-fcf856820aab-column-120 h-[72px] px-4 py-2 w-[400px] text-[#121417] text-sm font-normal leading-normal">
+                        Product E
+                      </td>
+                      <td class="table-9d0d70e4-a03b-45e3-8a83-fcf856820aab-column-240 h-[72px] px-4 py-2 w-[400px] text-[#687682] text-sm font-normal leading-normal">
+                        Description of Product E
+                      </td>
+                      <td class="table-9d0d70e4-a03b-45e3-8a83-fcf856820aab-column-360 h-[72px] px-4 py-2 w-[400px] text-[#687682] text-sm font-normal leading-normal">
+                        Feature 9, Feature 10
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <style>
+                          @container(max-width:120px){.table-9d0d70e4-a03b-45e3-8a83-fcf856820aab-column-120{display: none;}}
+                @container(max-width:240px){.table-9d0d70e4-a03b-45e3-8a83-fcf856820aab-column-240{display: none;}}
+                @container(max-width:360px){.table-9d0d70e4-a03b-45e3-8a83-fcf856820aab-column-360{display: none;}}
+              </style>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

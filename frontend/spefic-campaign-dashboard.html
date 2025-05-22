@@ -1,0 +1,623 @@
+<html>
+  <head>
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
+    <link
+      rel="stylesheet"
+      as="style"
+      onload="this.rel='stylesheet'"
+      href="https://fonts.googleapis.com/css2?display=swap&amp;family=Inter%3Awght%40400%3B500%3B700%3B900&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900"
+    />
+
+    <title>Stitch Design</title>
+    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  </head>
+  <body>
+    <div class="relative flex size-full min-h-screen flex-col bg-[#f9f9fb] group/design-root overflow-x-hidden" style='font-family: Inter, "Noto Sans", sans-serif;'>
+      <div class="layout-container flex h-full grow flex-col">
+        <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#e9eaf2] px-10 py-3">
+          <div class="flex items-center gap-4 text-[#0f111a]">
+            <div class="size-4">
+              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z"
+                  fill="currentColor"
+                ></path>
+              </svg>
+            </div>
+            <h2 class="text-[#0f111a] text-lg font-bold leading-tight tracking-[-0.015em]">CampaignPro</h2>
+          </div>
+          <div class="flex flex-1 justify-end gap-8">
+            <div class="flex items-center gap-9">
+              <a class="text-[#0f111a] text-sm font-medium leading-normal" href="#">Dashboard</a>
+              <a class="text-[#0f111a] text-sm font-medium leading-normal" href="#">Campaigns</a>
+              <a class="text-[#0f111a] text-sm font-medium leading-normal" href="#">Templates</a>
+              <a class="text-[#0f111a] text-sm font-medium leading-normal" href="#">Leads</a>
+              <a class="text-[#0f111a] text-sm font-medium leading-normal" href="#">Settings</a>
+            </div>
+            <div
+              class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
+              style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBc_bZ2e9QXRGJNnTdv2GrUr5Rg2uT4_fqlF973e34IGkA-pUUOMOh2UrqpusHONSbJErg6i5LjvHk3OFqj5S4QTZzpaSYYz7gJgHfO6YhH1E-eZejatkYlrXJW30bytFW-q8QF4XLmKMnWnNEwMq69QWjMV6rmOJ3Coz1O20AZtVJPGcy2ei56JEJVpMqEmNeM4_Ag7g1f0qwTmmUXxcgiujpOQ_LK8QwYrstSZG4FVeApI5sbA7iXLjpS-90UWwwlLLNVKTWwq60");'
+            ></div>
+          </div>
+        </header>
+        <div class="px-40 flex flex-1 justify-center py-5">
+          <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
+            <div class="flex flex-wrap justify-between gap-3 p-4">
+              <div class="flex min-w-72 flex-col gap-3">
+                <p class="text-[#0f111a] tracking-light text-[32px] font-bold leading-tight">Campaign: Summer Sale</p>
+                <p class="text-[#56618f] text-sm font-normal leading-normal">Product: Eco-Friendly Water Bottles | Dates: July 1 - August 31 | Status: Active</p>
+              </div>
+              <button
+                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-8 px-4 bg-[#e9eaf2] text-[#0f111a] text-sm font-medium leading-normal"
+              >
+                <span class="truncate">Edit Campaign Details</span>
+              </button>
+            </div>
+            <div class="pb-3">
+              <div class="flex border-b border-[#d2d6e4] px-4 gap-8">
+                <a class="flex flex-col items-center justify-center border-b-[3px] border-b-[#eaedfa] text-[#0f111a] pb-[13px] pt-4" href="#">
+                  <p class="text-[#0f111a] text-sm font-bold leading-normal tracking-[0.015em]">Stats Overview</p>
+                </a>
+                <a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-[#56618f] pb-[13px] pt-4" href="#">
+                  <p class="text-[#56618f] text-sm font-bold leading-normal tracking-[0.015em]">Campaign Leads</p>
+                </a>
+                <a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-[#56618f] pb-[13px] pt-4" href="#">
+                  <p class="text-[#56618f] text-sm font-bold leading-normal tracking-[0.015em]">Message Scheduling</p>
+                </a>
+                <a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-[#56618f] pb-[13px] pt-4" href="#">
+                  <p class="text-[#56618f] text-sm font-bold leading-normal tracking-[0.015em]">Campaign Links</p>
+                </a>
+                <a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-[#56618f] pb-[13px] pt-4" href="#">
+                  <p class="text-[#56618f] text-sm font-bold leading-normal tracking-[0.015em]">Settings</p>
+                </a>
+              </div>
+            </div>
+            <h2 class="text-[#0f111a] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Stats Overview</h2>
+            <div class="flex flex-wrap gap-4 p-4">
+              <div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-xl p-6 border border-[#d2d6e4]">
+                <p class="text-[#0f111a] text-base font-medium leading-normal">Total Leads</p>
+                <p class="text-[#0f111a] tracking-light text-2xl font-bold leading-tight">1500</p>
+              </div>
+              <div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-xl p-6 border border-[#d2d6e4]">
+                <p class="text-[#0f111a] text-base font-medium leading-normal">Sent</p>
+                <p class="text-[#0f111a] tracking-light text-2xl font-bold leading-tight">1200</p>
+              </div>
+              <div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-xl p-6 border border-[#d2d6e4]">
+                <p class="text-[#0f111a] text-base font-medium leading-normal">Clicks</p>
+                <p class="text-[#0f111a] tracking-light text-2xl font-bold leading-tight">300</p>
+              </div>
+              <div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-xl p-6 border border-[#d2d6e4]">
+                <p class="text-[#0f111a] text-base font-medium leading-normal">Conversions</p>
+                <p class="text-[#0f111a] tracking-light text-2xl font-bold leading-tight">60</p>
+              </div>
+              <div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-xl p-6 border border-[#d2d6e4]">
+                <p class="text-[#0f111a] text-base font-medium leading-normal">Conversion Rate</p>
+                <p class="text-[#0f111a] tracking-light text-2xl font-bold leading-tight">5%</p>
+              </div>
+              <div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-xl p-6 border border-[#d2d6e4]">
+                <p class="text-[#0f111a] text-base font-medium leading-normal">Best CTA/Message</p>
+                <p class="text-[#0f111a] tracking-light text-2xl font-bold leading-tight">Summer Sale - 20% Off</p>
+              </div>
+            </div>
+            <div class="flex flex-wrap gap-4 px-4 py-6">
+              <div class="flex min-w-72 flex-1 flex-col gap-2">
+                <p class="text-[#0f111a] text-base font-medium leading-normal">Clicks Over Time</p>
+                <p class="text-[#0f111a] tracking-light text-[32px] font-bold leading-tight truncate">+15% from last week</p>
+                <div class="flex gap-1">
+                  <p class="text-[#56618f] text-base font-normal leading-normal">Last 30 Days</p>
+                  <p class="text-[#07883d] text-base font-medium leading-normal">+15%</p>
+                </div>
+                <div class="flex min-h-[180px] flex-1 flex-col gap-8 py-4">
+                  <svg width="100%" height="148" viewBox="-3 0 478 150" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+                    <path
+                      d="M0 109C18.1538 109 18.1538 21 36.3077 21C54.4615 21 54.4615 41 72.6154 41C90.7692 41 90.7692 93 108.923 93C127.077 93 127.077 33 145.231 33C163.385 33 163.385 101 181.538 101C199.692 101 199.692 61 217.846 61C236 61 236 45 254.154 45C272.308 45 272.308 121 290.462 121C308.615 121 308.615 149 326.769 149C344.923 149 344.923 1 363.077 1C381.231 1 381.231 81 399.385 81C417.538 81 417.538 129 435.692 129C453.846 129 453.846 25 472 25V149H326.769H0V109Z"
+                      fill="url(#paint0_linear_1131_5935)"
+                    ></path>
+                    <path
+                      d="M0 109C18.1538 109 18.1538 21 36.3077 21C54.4615 21 54.4615 41 72.6154 41C90.7692 41 90.7692 93 108.923 93C127.077 93 127.077 33 145.231 33C163.385 33 163.385 101 181.538 101C199.692 101 199.692 61 217.846 61C236 61 236 45 254.154 45C272.308 45 272.308 121 290.462 121C308.615 121 308.615 149 326.769 149C344.923 149 344.923 1 363.077 1C381.231 1 381.231 81 399.385 81C417.538 81 417.538 129 435.692 129C453.846 129 453.846 25 472 25"
+                      stroke="#56618f"
+                      stroke-width="3"
+                      stroke-linecap="round"
+                    ></path>
+                    <defs>
+                      <linearGradient id="paint0_linear_1131_5935" x1="236" y1="1" x2="236" y2="149" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#e9eaf2"></stop>
+                        <stop offset="1" stop-color="#e9eaf2" stop-opacity="0"></stop>
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                  <div class="flex justify-around">
+                    <p class="text-[#56618f] text-[13px] font-bold leading-normal tracking-[0.015em]">Week 1</p>
+                    <p class="text-[#56618f] text-[13px] font-bold leading-normal tracking-[0.015em]">Week 2</p>
+                    <p class="text-[#56618f] text-[13px] font-bold leading-normal tracking-[0.015em]">Week 3</p>
+                    <p class="text-[#56618f] text-[13px] font-bold leading-normal tracking-[0.015em]">Week 4</p>
+                  </div>
+                </div>
+              </div>
+              <div class="flex min-w-72 flex-1 flex-col gap-2">
+                <p class="text-[#0f111a] text-base font-medium leading-normal">Conversions by Message</p>
+                <p class="text-[#0f111a] tracking-light text-[32px] font-bold leading-tight truncate">+10% from last week</p>
+                <div class="flex gap-1">
+                  <p class="text-[#56618f] text-base font-normal leading-normal">Last 30 Days</p>
+                  <p class="text-[#07883d] text-base font-medium leading-normal">+10%</p>
+                </div>
+                <div class="grid min-h-[180px] grid-flow-col gap-6 grid-rows-[1fr_auto] items-end justify-items-center px-3">
+                  <div class="border-[#56618f] bg-[#e9eaf2] border-t-2 w-full" style="height: 90%;"></div>
+                  <p class="text-[#56618f] text-[13px] font-bold leading-normal tracking-[0.015em]">Message 1</p>
+                  <div class="border-[#56618f] bg-[#e9eaf2] border-t-2 w-full" style="height: 10%;"></div>
+                  <p class="text-[#56618f] text-[13px] font-bold leading-normal tracking-[0.015em]">Message 2</p>
+                  <div class="border-[#56618f] bg-[#e9eaf2] border-t-2 w-full" style="height: 30%;"></div>
+                  <p class="text-[#56618f] text-[13px] font-bold leading-normal tracking-[0.015em]">Message 3</p>
+                </div>
+              </div>
+            </div>
+            <div class="flex px-4 py-3 justify-start">
+              <button
+                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#e9eaf2] text-[#0f111a] text-sm font-bold leading-normal tracking-[0.015em]"
+              >
+                <span class="truncate">Refresh Stats</span>
+              </button>
+            </div>
+            <div class="pb-3">
+              <div class="flex border-b border-[#d2d6e4] px-4 gap-8">
+                <a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-[#56618f] pb-[13px] pt-4" href="#">
+                  <p class="text-[#56618f] text-sm font-bold leading-normal tracking-[0.015em]">Stats Overview</p>
+                </a>
+                <a class="flex flex-col items-center justify-center border-b-[3px] border-b-[#eaedfa] text-[#0f111a] pb-[13px] pt-4" href="#">
+                  <p class="text-[#0f111a] text-sm font-bold leading-normal tracking-[0.015em]">Campaign Leads</p>
+                </a>
+                <a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-[#56618f] pb-[13px] pt-4" href="#">
+                  <p class="text-[#56618f] text-sm font-bold leading-normal tracking-[0.015em]">Message Scheduling</p>
+                </a>
+                <a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-[#56618f] pb-[13px] pt-4" href="#">
+                  <p class="text-[#56618f] text-sm font-bold leading-normal tracking-[0.015em]">Campaign Links</p>
+                </a>
+                <a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-[#56618f] pb-[13px] pt-4" href="#">
+                  <p class="text-[#56618f] text-sm font-bold leading-normal tracking-[0.015em]">Settings</p>
+                </a>
+              </div>
+            </div>
+            <h2 class="text-[#0f111a] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Campaign Leads</h2>
+            <div class="px-4 py-3 @container">
+              <div class="flex overflow-hidden rounded-xl border border-[#d2d6e4] bg-[#f9f9fb]">
+                <table class="flex-1">
+                  <thead>
+                    <tr class="bg-[#f9f9fb]">
+                      <th class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-120 px-4 py-3 text-left text-[#0f111a] w-[400px] text-sm font-medium leading-normal">
+                        Lead Full Name
+                      </th>
+                      <th class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-240 px-4 py-3 text-left text-[#0f111a] w-[400px] text-sm font-medium leading-normal">Email</th>
+                      <th class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-360 px-4 py-3 text-left text-[#0f111a] w-[400px] text-sm font-medium leading-normal">
+                        Added Date
+                      </th>
+                      <th class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-480 px-4 py-3 text-left text-[#0f111a] w-60 text-sm font-medium leading-normal">Converted</th>
+                      <th class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-600 px-4 py-3 text-left text-[#0f111a] w-[400px] text-sm font-medium leading-normal">
+                        Last Message Sent
+                      </th>
+                      <th class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-720 px-4 py-3 text-left text-[#0f111a] w-[400px] text-sm font-medium leading-normal">
+                        Next Scheduled Message
+                      </th>
+                      <th class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-840 px-4 py-3 text-left text-[#0f111a] w-60 text-[#56618f] text-sm font-medium leading-normal">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="border-t border-t-[#d2d6e4]">
+                      <td class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-120 h-[72px] px-4 py-2 w-[400px] text-[#0f111a] text-sm font-normal leading-normal">
+                        Sophia Clark
+                      </td>
+                      <td class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-240 h-[72px] px-4 py-2 w-[400px] text-[#56618f] text-sm font-normal leading-normal">
+                        sophia.clark@email.com
+                      </td>
+                      <td class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-360 h-[72px] px-4 py-2 w-[400px] text-[#56618f] text-sm font-normal leading-normal">
+                        2023-07-05
+                      </td>
+                      <td class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-480 h-[72px] px-4 py-2 w-60 text-sm font-normal leading-normal">
+                        <button
+                          class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-8 px-4 bg-[#e9eaf2] text-[#0f111a] text-sm font-medium leading-normal w-full"
+                        >
+                          <span class="truncate">No</span>
+                        </button>
+                      </td>
+                      <td class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-600 h-[72px] px-4 py-2 w-[400px] text-[#56618f] text-sm font-normal leading-normal">
+                        Summer Sale - 20% Off
+                      </td>
+                      <td class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-720 h-[72px] px-4 py-2 w-[400px] text-[#56618f] text-sm font-normal leading-normal">
+                        2023-07-15 10:00 AM
+                      </td>
+                      <td class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-840 h-[72px] px-4 py-2 w-60 text-[#56618f] text-sm font-bold leading-normal tracking-[0.015em]">
+                        Manage Messages
+                      </td>
+                    </tr>
+                    <tr class="border-t border-t-[#d2d6e4]">
+                      <td class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-120 h-[72px] px-4 py-2 w-[400px] text-[#0f111a] text-sm font-normal leading-normal">
+                        Ethan Carter
+                      </td>
+                      <td class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-240 h-[72px] px-4 py-2 w-[400px] text-[#56618f] text-sm font-normal leading-normal">
+                        ethan.carter@email.com
+                      </td>
+                      <td class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-360 h-[72px] px-4 py-2 w-[400px] text-[#56618f] text-sm font-normal leading-normal">
+                        2023-07-08
+                      </td>
+                      <td class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-480 h-[72px] px-4 py-2 w-60 text-sm font-normal leading-normal">
+                        <button
+                          class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-8 px-4 bg-[#e9eaf2] text-[#0f111a] text-sm font-medium leading-normal w-full"
+                        >
+                          <span class="truncate">Yes</span>
+                        </button>
+                      </td>
+                      <td class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-600 h-[72px] px-4 py-2 w-[400px] text-[#56618f] text-sm font-normal leading-normal">
+                        Summer Sale - 20% Off
+                      </td>
+                      <td class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-720 h-[72px] px-4 py-2 w-[400px] text-[#56618f] text-sm font-normal leading-normal">N/A</td>
+                      <td class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-840 h-[72px] px-4 py-2 w-60 text-[#56618f] text-sm font-bold leading-normal tracking-[0.015em]">
+                        Manage Messages
+                      </td>
+                    </tr>
+                    <tr class="border-t border-t-[#d2d6e4]">
+                      <td class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-120 h-[72px] px-4 py-2 w-[400px] text-[#0f111a] text-sm font-normal leading-normal">
+                        Olivia Bennett
+                      </td>
+                      <td class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-240 h-[72px] px-4 py-2 w-[400px] text-[#56618f] text-sm font-normal leading-normal">
+                        olivia.bennett@email.com
+                      </td>
+                      <td class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-360 h-[72px] px-4 py-2 w-[400px] text-[#56618f] text-sm font-normal leading-normal">
+                        2023-07-10
+                      </td>
+                      <td class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-480 h-[72px] px-4 py-2 w-60 text-sm font-normal leading-normal">
+                        <button
+                          class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-8 px-4 bg-[#e9eaf2] text-[#0f111a] text-sm font-medium leading-normal w-full"
+                        >
+                          <span class="truncate">No</span>
+                        </button>
+                      </td>
+                      <td class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-600 h-[72px] px-4 py-2 w-[400px] text-[#56618f] text-sm font-normal leading-normal">
+                        Summer Sale - 20% Off
+                      </td>
+                      <td class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-720 h-[72px] px-4 py-2 w-[400px] text-[#56618f] text-sm font-normal leading-normal">
+                        2023-07-18 11:00 AM
+                      </td>
+                      <td class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-840 h-[72px] px-4 py-2 w-60 text-[#56618f] text-sm font-bold leading-normal tracking-[0.015em]">
+                        Manage Messages
+                      </td>
+                    </tr>
+                    <tr class="border-t border-t-[#d2d6e4]">
+                      <td class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-120 h-[72px] px-4 py-2 w-[400px] text-[#0f111a] text-sm font-normal leading-normal">
+                        Liam Foster
+                      </td>
+                      <td class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-240 h-[72px] px-4 py-2 w-[400px] text-[#56618f] text-sm font-normal leading-normal">
+                        liam.foster@email.com
+                      </td>
+                      <td class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-360 h-[72px] px-4 py-2 w-[400px] text-[#56618f] text-sm font-normal leading-normal">
+                        2023-07-12
+                      </td>
+                      <td class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-480 h-[72px] px-4 py-2 w-60 text-sm font-normal leading-normal">
+                        <button
+                          class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-8 px-4 bg-[#e9eaf2] text-[#0f111a] text-sm font-medium leading-normal w-full"
+                        >
+                          <span class="truncate">No</span>
+                        </button>
+                      </td>
+                      <td class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-600 h-[72px] px-4 py-2 w-[400px] text-[#56618f] text-sm font-normal leading-normal">
+                        Summer Sale - 20% Off
+                      </td>
+                      <td class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-720 h-[72px] px-4 py-2 w-[400px] text-[#56618f] text-sm font-normal leading-normal">
+                        2023-07-20 09:00 AM
+                      </td>
+                      <td class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-840 h-[72px] px-4 py-2 w-60 text-[#56618f] text-sm font-bold leading-normal tracking-[0.015em]">
+                        Manage Messages
+                      </td>
+                    </tr>
+                    <tr class="border-t border-t-[#d2d6e4]">
+                      <td class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-120 h-[72px] px-4 py-2 w-[400px] text-[#0f111a] text-sm font-normal leading-normal">
+                        Ava Reynolds
+                      </td>
+                      <td class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-240 h-[72px] px-4 py-2 w-[400px] text-[#56618f] text-sm font-normal leading-normal">
+                        ava.reynolds@email.com
+                      </td>
+                      <td class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-360 h-[72px] px-4 py-2 w-[400px] text-[#56618f] text-sm font-normal leading-normal">
+                        2023-07-15
+                      </td>
+                      <td class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-480 h-[72px] px-4 py-2 w-60 text-sm font-normal leading-normal">
+                        <button
+                          class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-8 px-4 bg-[#e9eaf2] text-[#0f111a] text-sm font-medium leading-normal w-full"
+                        >
+                          <span class="truncate">Yes</span>
+                        </button>
+                      </td>
+                      <td class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-600 h-[72px] px-4 py-2 w-[400px] text-[#56618f] text-sm font-normal leading-normal">
+                        Summer Sale - 20% Off
+                      </td>
+                      <td class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-720 h-[72px] px-4 py-2 w-[400px] text-[#56618f] text-sm font-normal leading-normal">N/A</td>
+                      <td class="table-cf6e9476-e409-402f-9718-66915bb3bf29-column-840 h-[72px] px-4 py-2 w-60 text-[#56618f] text-sm font-bold leading-normal tracking-[0.015em]">
+                        Manage Messages
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <style>
+                          @container(max-width:120px){.table-cf6e9476-e409-402f-9718-66915bb3bf29-column-120{display: none;}}
+                @container(max-width:240px){.table-cf6e9476-e409-402f-9718-66915bb3bf29-column-240{display: none;}}
+                @container(max-width:360px){.table-cf6e9476-e409-402f-9718-66915bb3bf29-column-360{display: none;}}
+                @container(max-width:480px){.table-cf6e9476-e409-402f-9718-66915bb3bf29-column-480{display: none;}}
+                @container(max-width:600px){.table-cf6e9476-e409-402f-9718-66915bb3bf29-column-600{display: none;}}
+                @container(max-width:720px){.table-cf6e9476-e409-402f-9718-66915bb3bf29-column-720{display: none;}}
+                @container(max-width:840px){.table-cf6e9476-e409-402f-9718-66915bb3bf29-column-840{display: none;}}
+              </style>
+            </div>
+            <div class="flex justify-stretch">
+              <div class="flex flex-1 gap-3 flex-wrap px-4 py-3 justify-start">
+                <button
+                  class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#e9eaf2] text-[#0f111a] text-sm font-bold leading-normal tracking-[0.015em]"
+                >
+                  <span class="truncate">Add More Leads to Campaign</span>
+                </button>
+                <button
+                  class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#e9eaf2] text-[#0f111a] text-sm font-bold leading-normal tracking-[0.015em]"
+                >
+                  <span class="truncate">Show only unconverted</span>
+                </button>
+              </div>
+            </div>
+            <div class="pb-3">
+              <div class="flex border-b border-[#d2d6e4] px-4 gap-8">
+                <a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-[#56618f] pb-[13px] pt-4" href="#">
+                  <p class="text-[#56618f] text-sm font-bold leading-normal tracking-[0.015em]">Stats Overview</p>
+                </a>
+                <a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-[#56618f] pb-[13px] pt-4" href="#">
+                  <p class="text-[#56618f] text-sm font-bold leading-normal tracking-[0.015em]">Campaign Leads</p>
+                </a>
+                <a class="flex flex-col items-center justify-center border-b-[3px] border-b-[#eaedfa] text-[#0f111a] pb-[13px] pt-4" href="#">
+                  <p class="text-[#0f111a] text-sm font-bold leading-normal tracking-[0.015em]">Message Scheduling</p>
+                </a>
+                <a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-[#56618f] pb-[13px] pt-4" href="#">
+                  <p class="text-[#56618f] text-sm font-bold leading-normal tracking-[0.015em]">Campaign Links</p>
+                </a>
+                <a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-[#56618f] pb-[13px] pt-4" href="#">
+                  <p class="text-[#56618f] text-sm font-bold leading-normal tracking-[0.015em]">Settings</p>
+                </a>
+              </div>
+            </div>
+            <h2 class="text-[#0f111a] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Message Scheduling &amp; Personalization</h2>
+            <div class="px-4 py-3 @container">
+              <div class="flex overflow-hidden rounded-xl border border-[#d2d6e4] bg-[#f9f9fb]">
+                <table class="flex-1">
+                  <thead>
+                    <tr class="bg-[#f9f9fb]">
+                      <th class="table-15c43153-a1bb-41d0-8ae0-7eda23033522-column-120 px-4 py-3 text-left text-[#0f111a] w-[400px] text-sm font-medium leading-normal">
+                        Message Template Subject
+                      </th>
+                      <th class="table-15c43153-a1bb-41d0-8ae0-7eda23033522-column-240 px-4 py-3 text-left text-[#0f111a] w-[400px] text-sm font-medium leading-normal">
+                        Personalized Snippet
+                      </th>
+                      <th class="table-15c43153-a1bb-41d0-8ae0-7eda23033522-column-360 px-4 py-3 text-left text-[#0f111a] w-60 text-sm font-medium leading-normal">Status</th>
+                      <th class="table-15c43153-a1bb-41d0-8ae0-7eda23033522-column-480 px-4 py-3 text-left text-[#0f111a] w-[400px] text-sm font-medium leading-normal">
+                        Scheduled At
+                      </th>
+                      <th class="table-15c43153-a1bb-41d0-8ae0-7eda23033522-column-600 px-4 py-3 text-left text-[#0f111a] w-[400px] text-sm font-medium leading-normal">Sent At</th>
+                      <th class="table-15c43153-a1bb-41d0-8ae0-7eda23033522-column-720 px-4 py-3 text-left text-[#0f111a] w-60 text-[#56618f] text-sm font-medium leading-normal">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="border-t border-t-[#d2d6e4]">
+                      <td class="table-15c43153-a1bb-41d0-8ae0-7eda23033522-column-120 h-[72px] px-4 py-2 w-[400px] text-[#0f111a] text-sm font-normal leading-normal">
+                        Summer Sale - 20% Off
+                      </td>
+                      <td class="table-15c43153-a1bb-41d0-8ae0-7eda23033522-column-240 h-[72px] px-4 py-2 w-[400px] text-[#56618f] text-sm font-normal leading-normal">
+                        Hi Sophia, Get 20% off on your first purchase!
+                      </td>
+                      <td class="table-15c43153-a1bb-41d0-8ae0-7eda23033522-column-360 h-[72px] px-4 py-2 w-60 text-sm font-normal leading-normal">
+                        <button
+                          class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-8 px-4 bg-[#e9eaf2] text-[#0f111a] text-sm font-medium leading-normal w-full"
+                        >
+                          <span class="truncate">Sent</span>
+                        </button>
+                      </td>
+                      <td class="table-15c43153-a1bb-41d0-8ae0-7eda23033522-column-480 h-[72px] px-4 py-2 w-[400px] text-[#56618f] text-sm font-normal leading-normal">
+                        2023-07-10 10:00 AM
+                      </td>
+                      <td class="table-15c43153-a1bb-41d0-8ae0-7eda23033522-column-600 h-[72px] px-4 py-2 w-[400px] text-[#56618f] text-sm font-normal leading-normal">
+                        2023-07-10 10:05 AM
+                      </td>
+                      <td class="table-15c43153-a1bb-41d0-8ae0-7eda23033522-column-720 h-[72px] px-4 py-2 w-60 text-[#56618f] text-sm font-bold leading-normal tracking-[0.015em]">
+                        Log Response
+                      </td>
+                    </tr>
+                    <tr class="border-t border-t-[#d2d6e4]">
+                      <td class="table-15c43153-a1bb-41d0-8ae0-7eda23033522-column-120 h-[72px] px-4 py-2 w-[400px] text-[#0f111a] text-sm font-normal leading-normal">
+                        New Product Launch
+                      </td>
+                      <td class="table-15c43153-a1bb-41d0-8ae0-7eda23033522-column-240 h-[72px] px-4 py-2 w-[400px] text-[#56618f] text-sm font-normal leading-normal">
+                        Hi Sophia, Check out our new eco-friendly water bottles!
+                      </td>
+                      <td class="table-15c43153-a1bb-41d0-8ae0-7eda23033522-column-360 h-[72px] px-4 py-2 w-60 text-sm font-normal leading-normal">
+                        <button
+                          class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-8 px-4 bg-[#e9eaf2] text-[#0f111a] text-sm font-medium leading-normal w-full"
+                        >
+                          <span class="truncate">Scheduled</span>
+                        </button>
+                      </td>
+                      <td class="table-15c43153-a1bb-41d0-8ae0-7eda23033522-column-480 h-[72px] px-4 py-2 w-[400px] text-[#56618f] text-sm font-normal leading-normal">
+                        2023-07-15 10:00 AM
+                      </td>
+                      <td class="table-15c43153-a1bb-41d0-8ae0-7eda23033522-column-600 h-[72px] px-4 py-2 w-[400px] text-[#56618f] text-sm font-normal leading-normal">N/A</td>
+                      <td class="table-15c43153-a1bb-41d0-8ae0-7eda23033522-column-720 h-[72px] px-4 py-2 w-60 text-[#56618f] text-sm font-bold leading-normal tracking-[0.015em]">
+                        Personalize Message
+                      </td>
+                    </tr>
+                    <tr class="border-t border-t-[#d2d6e4]">
+                      <td class="table-15c43153-a1bb-41d0-8ae0-7eda23033522-column-120 h-[72px] px-4 py-2 w-[400px] text-[#0f111a] text-sm font-normal leading-normal">
+                        Follow Up - Summer Sale
+                      </td>
+                      <td class="table-15c43153-a1bb-41d0-8ae0-7eda23033522-column-240 h-[72px] px-4 py-2 w-[400px] text-[#56618f] text-sm font-normal leading-normal">
+                        Hi Sophia, Don't miss out on our summer sale!
+                      </td>
+                      <td class="table-15c43153-a1bb-41d0-8ae0-7eda23033522-column-360 h-[72px] px-4 py-2 w-60 text-sm font-normal leading-normal">
+                        <button
+                          class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-8 px-4 bg-[#e9eaf2] text-[#0f111a] text-sm font-medium leading-normal w-full"
+                        >
+                          <span class="truncate">Draft</span>
+                        </button>
+                      </td>
+                      <td class="table-15c43153-a1bb-41d0-8ae0-7eda23033522-column-480 h-[72px] px-4 py-2 w-[400px] text-[#56618f] text-sm font-normal leading-normal">N/A</td>
+                      <td class="table-15c43153-a1bb-41d0-8ae0-7eda23033522-column-600 h-[72px] px-4 py-2 w-[400px] text-[#56618f] text-sm font-normal leading-normal">N/A</td>
+                      <td class="table-15c43153-a1bb-41d0-8ae0-7eda23033522-column-720 h-[72px] px-4 py-2 w-60 text-[#56618f] text-sm font-bold leading-normal tracking-[0.015em]">
+                        Personalize Message
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <style>
+                          @container(max-width:120px){.table-15c43153-a1bb-41d0-8ae0-7eda23033522-column-120{display: none;}}
+                @container(max-width:240px){.table-15c43153-a1bb-41d0-8ae0-7eda23033522-column-240{display: none;}}
+                @container(max-width:360px){.table-15c43153-a1bb-41d0-8ae0-7eda23033522-column-360{display: none;}}
+                @container(max-width:480px){.table-15c43153-a1bb-41d0-8ae0-7eda23033522-column-480{display: none;}}
+                @container(max-width:600px){.table-15c43153-a1bb-41d0-8ae0-7eda23033522-column-600{display: none;}}
+                @container(max-width:720px){.table-15c43153-a1bb-41d0-8ae0-7eda23033522-column-720{display: none;}}
+              </style>
+            </div>
+            <div class="flex px-4 py-3 justify-start">
+              <button
+                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#e9eaf2] text-[#0f111a] text-sm font-bold leading-normal tracking-[0.015em]"
+              >
+                <span class="truncate">Assign New Message to this Lead</span>
+              </button>
+            </div>
+            <div class="pb-3">
+              <div class="flex border-b border-[#d2d6e4] px-4 gap-8">
+                <a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-[#56618f] pb-[13px] pt-4" href="#">
+                  <p class="text-[#56618f] text-sm font-bold leading-normal tracking-[0.015em]">Stats Overview</p>
+                </a>
+                <a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-[#56618f] pb-[13px] pt-4" href="#">
+                  <p class="text-[#56618f] text-sm font-bold leading-normal tracking-[0.015em]">Campaign Leads</p>
+                </a>
+                <a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-[#56618f] pb-[13px] pt-4" href="#">
+                  <p class="text-[#56618f] text-sm font-bold leading-normal tracking-[0.015em]">Message Scheduling</p>
+                </a>
+                <a class="flex flex-col items-center justify-center border-b-[3px] border-b-[#eaedfa] text-[#0f111a] pb-[13px] pt-4" href="#">
+                  <p class="text-[#0f111a] text-sm font-bold leading-normal tracking-[0.015em]">Campaign Links</p>
+                </a>
+                <a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-[#56618f] pb-[13px] pt-4" href="#">
+                  <p class="text-[#56618f] text-sm font-bold leading-normal tracking-[0.015em]">Settings</p>
+                </a>
+              </div>
+            </div>
+            <h2 class="text-[#0f111a] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Campaign Links</h2>
+            <div class="px-4 py-3 @container">
+              <div class="flex overflow-hidden rounded-xl border border-[#d2d6e4] bg-[#f9f9fb]">
+                <table class="flex-1">
+                  <thead>
+                    <tr class="bg-[#f9f9fb]">
+                      <th class="table-9098d378-761e-4554-bf3b-b256a6bc956b-column-120 px-4 py-3 text-left text-[#0f111a] w-[400px] text-sm font-medium leading-normal">
+                        Original URL
+                      </th>
+                      <th class="table-9098d378-761e-4554-bf3b-b256a6bc956b-column-240 px-4 py-3 text-left text-[#0f111a] w-[400px] text-sm font-medium leading-normal">
+                        Full Trackable URL
+                      </th>
+                      <th class="table-9098d378-761e-4554-bf3b-b256a6bc956b-column-360 px-4 py-3 text-left text-[#0f111a] w-[400px] text-sm font-medium leading-normal">
+                        Ref Code
+                      </th>
+                      <th class="table-9098d378-761e-4554-bf3b-b256a6bc956b-column-480 px-4 py-3 text-left text-[#0f111a] w-[400px] text-sm font-medium leading-normal">
+                        Visit Count
+                      </th>
+                      <th class="table-9098d378-761e-4554-bf3b-b256a6bc956b-column-600 px-4 py-3 text-left text-[#0f111a] w-60 text-[#56618f] text-sm font-medium leading-normal">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="border-t border-t-[#d2d6e4]">
+                      <td class="table-9098d378-761e-4554-bf3b-b256a6bc956b-column-120 h-[72px] px-4 py-2 w-[400px] text-[#56618f] text-sm font-normal leading-normal">
+                        https://www.example.com/waterbottles
+                      </td>
+                      <td class="table-9098d378-761e-4554-bf3b-b256a6bc956b-column-240 h-[72px] px-4 py-2 w-[400px] text-[#56618f] text-sm font-normal leading-normal">
+                        https://track.campaignpro.com/summer-sale-123
+                      </td>
+                      <td class="table-9098d378-761e-4554-bf3b-b256a6bc956b-column-360 h-[72px] px-4 py-2 w-[400px] text-[#56618f] text-sm font-normal leading-normal">
+                        summer-sale-123
+                      </td>
+                      <td class="table-9098d378-761e-4554-bf3b-b256a6bc956b-column-480 h-[72px] px-4 py-2 w-[400px] text-[#56618f] text-sm font-normal leading-normal">50</td>
+                      <td class="table-9098d378-761e-4554-bf3b-b256a6bc956b-column-600 h-[72px] px-4 py-2 w-60 text-[#56618f] text-sm font-bold leading-normal tracking-[0.015em]">
+                        Copy URL
+                      </td>
+                    </tr>
+                    <tr class="border-t border-t-[#d2d6e4]">
+                      <td class="table-9098d378-761e-4554-bf3b-b256a6bc956b-column-120 h-[72px] px-4 py-2 w-[400px] text-[#56618f] text-sm font-normal leading-normal">
+                        https://www.example.com/new-product
+                      </td>
+                      <td class="table-9098d378-761e-4554-bf3b-b256a6bc956b-column-240 h-[72px] px-4 py-2 w-[400px] text-[#56618f] text-sm font-normal leading-normal">
+                        https://track.campaignpro.com/new-product-456
+                      </td>
+                      <td class="table-9098d378-761e-4554-bf3b-b256a6bc956b-column-360 h-[72px] px-4 py-2 w-[400px] text-[#56618f] text-sm font-normal leading-normal">
+                        new-product-456
+                      </td>
+                      <td class="table-9098d378-761e-4554-bf3b-b256a6bc956b-column-480 h-[72px] px-4 py-2 w-[400px] text-[#56618f] text-sm font-normal leading-normal">25</td>
+                      <td class="table-9098d378-761e-4554-bf3b-b256a6bc956b-column-600 h-[72px] px-4 py-2 w-60 text-[#56618f] text-sm font-bold leading-normal tracking-[0.015em]">
+                        Copy URL
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <style>
+                          @container(max-width:120px){.table-9098d378-761e-4554-bf3b-b256a6bc956b-column-120{display: none;}}
+                @container(max-width:240px){.table-9098d378-761e-4554-bf3b-b256a6bc956b-column-240{display: none;}}
+                @container(max-width:360px){.table-9098d378-761e-4554-bf3b-b256a6bc956b-column-360{display: none;}}
+                @container(max-width:480px){.table-9098d378-761e-4554-bf3b-b256a6bc956b-column-480{display: none;}}
+                @container(max-width:600px){.table-9098d378-761e-4554-bf3b-b256a6bc956b-column-600{display: none;}}
+              </style>
+            </div>
+            <div class="flex px-4 py-3 justify-start">
+              <button
+                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#e9eaf2] text-[#0f111a] text-sm font-bold leading-normal tracking-[0.015em]"
+              >
+                <span class="truncate">Create New Trackable Link for this Campaign</span>
+              </button>
+            </div>
+            <div class="pb-3">
+              <div class="flex border-b border-[#d2d6e4] px-4 gap-8">
+                <a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-[#56618f] pb-[13px] pt-4" href="#">
+                  <p class="text-[#56618f] text-sm font-bold leading-normal tracking-[0.015em]">Stats Overview</p>
+                </a>
+                <a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-[#56618f] pb-[13px] pt-4" href="#">
+                  <p class="text-[#56618f] text-sm font-bold leading-normal tracking-[0.015em]">Campaign Leads</p>
+                </a>
+                <a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-[#56618f] pb-[13px] pt-4" href="#">
+                  <p class="text-[#56618f] text-sm font-bold leading-normal tracking-[0.015em]">Message Scheduling</p>
+                </a>
+                <a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-[#56618f] pb-[13px] pt-4" href="#">
+                  <p class="text-[#56618f] text-sm font-bold leading-normal tracking-[0.015em]">Campaign Links</p>
+                </a>
+                <a class="flex flex-col items-center justify-center border-b-[3px] border-b-[#eaedfa] text-[#0f111a] pb-[13px] pt-4" href="#">
+                  <p class="text-[#0f111a] text-sm font-bold leading-normal tracking-[0.015em]">Settings</p>
+                </a>
+              </div>
+            </div>
+            <h2 class="text-[#0f111a] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Settings</h2>
+            <div class="flex px-4 py-3 justify-start">
+              <button
+                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#e9eaf2] text-[#0f111a] text-sm font-bold leading-normal tracking-[0.015em]"
+              >
+                <span class="truncate">Edit Campaign Details</span>
+              </button>
+            </div>
+            <div class="flex px-4 py-3 justify-start">
+              <button
+                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#eaedfa] text-[#0f111a] text-sm font-bold leading-normal tracking-[0.015em]"
+              >
+                <span class="truncate">Launch Campaign</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
