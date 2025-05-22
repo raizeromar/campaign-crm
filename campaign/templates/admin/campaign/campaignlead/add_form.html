@@ -1,0 +1,117 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls %}
+
+{% block content %}
+<div id="content-main">
+  <form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="{{ form_url }}" method="post" id="{{ opts.model_name }}_form" novalidate>
+    {% csrf_token %}
+    {% block form_top %}{% endblock %}
+    
+    <fieldset class="module aligned">
+      <h2 style="background-color: #79aec8; color: white; padding: 8px 12px;">{% trans 'Add by specific lead' %}</h2>
+      {% for fieldset in adminform %}
+        {% include "admin/includes/fieldset.html" %}
+      {% endfor %}
+    </fieldset>
+    
+    <fieldset class="module aligned">
+      <h2 style="background-color: #79aec8; color: white; padding: 8px 12px;">{% trans 'OR Add multiple leads by filter' %}</h2>
+      <div class="form-row">
+        <div class="field-box">
+          <label for="id_lead_type">Lead Type:</label>
+          <select name="lead_type" id="id_lead_type">
+            <option value="">---------</option>
+            {% for value, name in lead_types.items %}
+              <option value="{{ value }}">{{ name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field-box">
+          <label for="id_lead_source">Lead Source:</label>
+          <select name="lead_source" id="id_lead_source">
+            <option value="">---------</option>
+            {% for value, name in lead_sources.items %}
+              <option value="{{ value }}">{{ name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="help" style="padding: 10px; background-color: #f8f8f8; border-left: 5px solid #79aec8; margin: 10px 0;">
+        <p>If you select filters, all leads matching these filters will be added to the campaign.</p>
+        <p>Leave both filters empty to add just a single lead selected above.</p>
+      </div>
+    </fieldset>
+    
+    {% block after_field_sets %}{% endblock %}
+    
+    {% block submit_buttons_bottom %}
+    <div class="submit-row">
+      <input type="submit" value="{% trans 'Save' %}" class="default" name="_save">
+      <input type="submit" value="{% trans 'Save and add another' %}" name="_addanother">
+      <input type="submit" value="{% trans 'Save and continue editing' %}" name="_continue">
+    </div>
+    {% endblock %}
+  </form>
+</div>
+
+<script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', function() {
+    var leadField = document.getElementById('id_lead');
+    var leadTypeField = document.getElementById('id_lead_type');
+    var leadSourceField = document.getElementById('id_lead_source');
+    var leadFieldRow = leadField ? leadField.closest('.form-row') : null;
+    
+    // Function to check if any filter is selected
+    function checkFilters() {
+      console.log('Checking filters: leadType=' + leadTypeField.value + ', leadSource=' + leadSourceField.value);
+      
+      if (leadTypeField.value || leadSourceField.value) {
+        // If filters are used, disable lead field
+        if (leadField && leadFieldRow) {
+          leadField.disabled = true;
+          leadFieldRow.style.opacity = '0.5';
+          // Add a note that this field is not required when using filters
+          var helpText = leadFieldRow.querySelector('.help') || document.createElement('div');
+          helpText.className = 'help';
+          helpText.textContent = 'Not required when using filters below';
+          if (!leadFieldRow.querySelector('.help')) {
+            leadFieldRow.appendChild(helpText);
+          }
+        }
+      } else {
+        // If no filters, enable lead field
+        if (leadField && leadFieldRow) {
+          leadField.disabled = false;
+          leadFieldRow.style.opacity = '1';
+          // Remove the help text if it exists
+          var helpText = leadFieldRow.querySelector('.help');
+          if (helpText) {
+            helpText.textContent = '';
+          }
+        }
+      }
+    }
+    
+    // Add event listeners
+    if (leadTypeField) {
+      leadTypeField.addEventListener('change', checkFilters);
+    }
+    if (leadSourceField) {
+      leadSourceField.addEventListener('change', checkFilters);
+    }
+    
+    // Initial check
+    checkFilters();
+    
+    // Before form submission, re-enable the lead field to ensure data is sent
+    document.querySelector('form').addEventListener('submit', function(e) {
+      console.log('Form submitted');
+      if (leadField) {
+        leadField.disabled = false;
+      }
+    });
+  });
+</script>
+{% endblock %}
