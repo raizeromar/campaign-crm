@@ -1,4 +1,4 @@
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import redirect, get_object_or_404, render
 from django.http import Http404
 from .models import Link
 import logging
@@ -41,3 +41,13 @@ def redirect_and_track(request, ref_code):
         # Log the error but don't expose details to user
         logger.error(f"Error tracking link visit: {str(e)}")
         raise Http404("Link not found")
+
+
+
+def dashboard(request):
+    """
+    Render the overall dashboard page
+    """
+    return render(request, 'overall-dashboard.html')
+
+
