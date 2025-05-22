@@ -8,14 +8,14 @@
     {% block form_top %}{% endblock %}
     
     <fieldset class="module aligned">
-      <h2 style="background-color: #79aec8; color: white; padding: 8px 12px;">{% trans 'Add by specific lead' %}</h2>
+      <h2>{% trans 'Add by specific lead' %}</h2>
       {% for fieldset in adminform %}
         {% include "admin/includes/fieldset.html" %}
       {% endfor %}
     </fieldset>
     
     <fieldset class="module aligned">
-      <h2 style="background-color: #79aec8; color: white; padding: 8px 12px;">{% trans 'OR Add multiple leads by filter' %}</h2>
+      <h2>{% trans 'OR Add multiple leads by filter' %}</h2>
       <div class="form-row">
         <div class="field-box">
           <label for="id_lead_type">Lead Type:</label>
@@ -38,7 +38,7 @@
           </select>
         </div>
       </div>
-      <div class="help" style="padding: 10px; background-color: #f8f8f8; border-left: 5px solid #79aec8; margin: 10px 0;">
+      <div class="help">
         <p>If you select filters, all leads matching these filters will be added to the campaign.</p>
         <p>Leave both filters empty to add just a single lead selected above.</p>
       </div>
