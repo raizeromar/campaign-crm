@@ -622,22 +622,13 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
                 utm_source = form.cleaned_data.get('utm_source')
                 utm_medium = form.cleaned_data.get('utm_medium')
                 utm_term = form.cleaned_data.get('utm_term')
+                utm_content = form.cleaned_data.get('utm_content')
                 description = form.cleaned_data.get('description')
                 
                 # Create a message assignment for each campaign lead
                 created_count = 0
                 for campaign_lead in campaign_leads:
-                    # Create a new MessageAssignment for each lead
-                    message_assignment = MessageAssignment(
-                        campaign_lead=campaign_lead,
-                        message=message,
-                        personlized_msg=obj.personlized_msg,
-                        scheduled_at=obj.scheduled_at
-                    )
-                    message_assignment.save()
-                    
-                    # Create a link for this message assignment
-                    utm_content = form.cleaned_data.get('utm_content') or f"email_{message_assignment.id}"
+                    # First create the link
                     link = Link(
                         campaign=campaign,
                         campaign_lead=campaign_lead,
@@ -650,9 +641,19 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
                     )
                     link.save()
                     
-                    # Attach link to message assignment
-                    message_assignment.url = link
-                    message_assignment.save()
+                    # Then create the message assignment with the link already set
+                    # This prevents the MessageAssignment.save() method from creating another link
+                    message_assignment = MessageAssignment(
+                        campaign_lead=campaign_lead,
+                        message=message,
+                        personlized_msg=obj.personlized_msg,
+                        scheduled_at=obj.scheduled_at,
+                        url=link  # Set the link here to prevent auto-creation
+                    )
+                    
+                    # Use the model's save method directly to bypass any custom save logic
+                    # that might create additional links
+                    self.model.save(message_assignment)
                     
                     created_count += 1
                 
@@ -663,8 +664,9 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
                     level=messages.SUCCESS
                 )
                 
-                # Don't save the original object
-                return
+                # Redirect to the message assignment list
+                from django.http import HttpResponseRedirect
+                return HttpResponseRedirect("../")
             else:
                 # No campaign leads found
                 self.message_user(
@@ -675,44 +677,60 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
                 return
         
         # Normal save for a single message assignment
-        super().save_model(request, obj, form, change)
-        
-        # Get UTM parameters from form
-        utm_source = form.cleaned_data.get('utm_source')
-        utm_medium = form.cleaned_data.get('utm_medium')
-        utm_term = form.cleaned_data.get('utm_term')
-        utm_content = form.cleaned_data.get('utm_content') or f"email_{obj.id}"
-        description = form.cleaned_data.get('description')
-        
-        # Create or update the link
-        if obj.url:
-            # Update existing link
-            link = obj.url
-            if utm_source:
-                link.utm_source = utm_source
-            if utm_medium:
-                link.utm_medium = utm_medium
-            link.utm_term = utm_term
-            link.utm_content = utm_content
-            link.description = description
-            link.save()
-        else:
-            # Create new link
-            link = Link(
-                campaign=obj.campaign_lead.campaign,
-                campaign_lead=obj.campaign_lead,
-                url=obj.campaign_lead.campaign.product.landing_page_url,
-                utm_source=utm_source or "campaign",
-                utm_medium=utm_medium or "email",
-                utm_term=utm_term,
-                utm_content=utm_content,
-                description=description
-            )
-            link.save()
+        if not change:
+            # For new assignments, save first to get an ID
+            super().save_model(request, obj, form, change)
             
-            # Attach link to message assignment
-            obj.url = link
-            obj.save()
+            # Get UTM parameters from form
+            utm_source = form.cleaned_data.get('utm_source')
+            utm_medium = form.cleaned_data.get('utm_medium')
+            utm_term = form.cleaned_data.get('utm_term')
+            utm_content = form.cleaned_data.get('utm_content') or f"email_{obj.id}"
+            description = form.cleaned_data.get('description')
+            
+            # Check if a link was already created by the model's save method
+            if not obj.url:
+                # Create new link
+                link = Link(
+                    campaign=obj.campaign_lead.campaign,
+                    campaign_lead=obj.campaign_lead,
+                    url=obj.campaign_lead.campaign.product.landing_page_url,
+                    utm_source=utm_source or "campaign",
+                    utm_medium=utm_medium or "email",
+                    utm_term=utm_term,
+                    utm_content=utm_content,
+                    description=description
+                )
+                link.save()
+                
+                # Attach link to message assignment
+                obj.url = link
+                obj.save()
+        else:
+            # For existing assignments, just update
+            super().save_model(request, obj, form, change)
+            
+            # Update the link if it exists
+            if obj.url:
+                link = obj.url
+                utm_source = form.cleaned_data.get('utm_source')
+                utm_medium = form.cleaned_data.get('utm_medium')
+                utm_term = form.cleaned_data.get('utm_term')
+                utm_content = form.cleaned_data.get('utm_content')
+                description = form.cleaned_data.get('description')
+                
+                if utm_source:
+                    link.utm_source = utm_source
+                if utm_medium:
+                    link.utm_medium = utm_medium
+                if utm_term:
+                    link.utm_term = utm_term
+                if utm_content:
+                    link.utm_content = utm_content
+                if description:
+                    link.description = description
+                
+                link.save()
 
 
 
