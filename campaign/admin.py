@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django.db.models import Count, Sum
 from django.contrib.admin import SimpleListFilter
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from .models import (
@@ -12,6 +12,7 @@ from .models import (
 )
 import logging
 from django.conf import settings
+from django.urls import path
 
 # Configure logger
 logger = logging.getLogger(__name__)
@@ -455,8 +456,25 @@ class LinkAdmin(admin.ModelAdmin):
         return "0"
     message_assignments_count.short_description = 'Used in Messages'
     
-    class Media:
-        js = ('admin/js/jquery.init.js',)
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path('get-campaign-leads/', self.admin_site.admin_view(self.get_campaign_leads), name='get_campaign_leads'),
+        ]
+        return custom_urls + urls
+    
+    def get_campaign_leads(self, request):
+        """AJAX view to get campaign leads for a campaign"""
+        campaign_id = request.GET.get('campaign_id')
+        if not campaign_id:
+            return JsonResponse({'error': 'No campaign ID provided'}, status=400)
+        
+        campaign_leads = CampaignLead.objects.filter(campaign_id=campaign_id)
+        leads_data = [{'id': cl.id, 'text': str(cl)} for cl in campaign_leads]
+        
+        return JsonResponse({'campaign_leads': leads_data})
+    
+    
         
     def changelist_view(self, request, extra_context=None):
         extra_context = extra_context or {}
@@ -496,26 +514,60 @@ class LinkAdmin(admin.ModelAdmin):
         <script type="text/javascript">
             (function($) {
                 $(document).ready(function() {
-                    // When campaign select changes, reload the page with the campaign parameter
-                    $('#id_campaign').on('change', function() {
-                        var campaignId = $(this).val();
-                        var currentUrl = window.location.href;
-                        
-                        // Remove existing campaign parameter if any
-                        currentUrl = currentUrl.replace(/[?&]campaign=\\d+/, '');
-                        
-                        // Add the new campaign parameter
-                        if (campaignId) {
-                            if (currentUrl.indexOf('?') > -1) {
-                                currentUrl += '&campaign=' + campaignId;
-                            } else {
-                                currentUrl += '?campaign=' + campaignId;
-                            }
+                    // Function to update campaign leads dropdown
+                    function updateCampaignLeads(campaignId) {
+                        if (!campaignId) {
+                            // Clear the dropdown if no campaign is selected
+                            var $campaignLeadSelect = $('#id_campaign_lead');
+                            $campaignLeadSelect.empty();
+                            $campaignLeadSelect.append('<option value="">---------</option>');
+                            return;
                         }
                         
-                        // Reload the page
-                        window.location.href = currentUrl;
+                        // Show loading indicator
+                        $('#id_campaign_lead').prop('disabled', true);
+                        
+                        // Make AJAX request to get campaign leads
+                        $.ajax({
+                            url: '/admin/campaign/link/get-campaign-leads/',
+                            data: {
+                                'campaign_id': campaignId
+                            },
+                            dataType: 'json',
+                            success: function(data) {
+                                var $campaignLeadSelect = $('#id_campaign_lead');
+                                $campaignLeadSelect.empty();
+                                $campaignLeadSelect.append('<option value="">---------</option>');
+                                
+                                // Add options for each campaign lead
+                                $.each(data.campaign_leads, function(i, item) {
+                                    $campaignLeadSelect.append(
+                                        $('<option></option>').val(item.id).text(item.text)
+                                    );
+                                });
+                                
+                                // Enable the dropdown
+                                $campaignLeadSelect.prop('disabled', false);
+                            },
+                            error: function(xhr, status, error) {
+                                console.error("Error loading campaign leads:", error);
+                                // Enable the dropdown even on error
+                                $('#id_campaign_lead').prop('disabled', false);
+                            }
+                        });
+                    }
+                    
+                    // When campaign select changes, update campaign leads
+                    $('#id_campaign').on('change', function() {
+                        var campaignId = $(this).val();
+                        updateCampaignLeads(campaignId);
                     });
+                    
+                    // Initial load if campaign is already selected
+                    var initialCampaignId = $('#id_campaign').val();
+                    if (initialCampaignId) {
+                        updateCampaignLeads(initialCampaignId);
+                    }
                 });
             })(django.jQuery);
         </script>
