@@ -377,15 +377,7 @@ class MessageAdmin(admin.ModelAdmin):
 
 
 
-
-
 class LinkAdminForm(forms.ModelForm):
-    create_for_all_leads = forms.BooleanField(
-        required=False,
-        label="Create for all campaign leads",
-        help_text="If checked, a link will be created for each lead in the selected campaign"
-    )
-    
     class Meta:
         model = Link
         fields = '__all__'
@@ -399,20 +391,10 @@ class LinkAdminForm(forms.ModelForm):
         # Update help text to be more clear
         self.fields['url'].help_text = "Will be auto-populated from campaign's product landing page if left empty"
         self.fields['utm_campaign'].help_text = "Will be auto-populated from campaign's short_name if left empty"
-        
-        # If this is an existing link, hide the create_for_all_leads field
-        if kwargs.get('instance') and kwargs['instance'].pk:
-            self.fields['create_for_all_leads'].widget = forms.HiddenInput()
     
     def clean(self):
         cleaned_data = super().clean()
         campaign = cleaned_data.get('campaign')
-        campaign_lead = cleaned_data.get('campaign_lead')
-        create_for_all_leads = cleaned_data.get('create_for_all_leads')
-        
-        # If creating for all leads, campaign_lead should be empty
-        if create_for_all_leads and campaign_lead:
-            self.add_error('campaign_lead', 'Leave this empty when creating links for all campaign leads')
         
         # Validate that campaign is selected if URL or utm_campaign is empty
         if not cleaned_data.get('url') and not campaign:
@@ -447,56 +429,6 @@ class LinkAdmin(admin.ModelAdmin):
             return format_html('<a href="/admin/campaign/messageassignment/?url__id__exact={}">{} assignments</a>', obj.id, count)
         return "0"
     message_assignments_count.short_description = 'Used in Messages'
-    
-    def save_model(self, request, obj, form, change):
-        create_for_all_leads = form.cleaned_data.get('create_for_all_leads')
-        
-        if create_for_all_leads and not change:
-            # Get the campaign
-            campaign = obj.campaign
-            
-            # Get all campaign leads for this campaign
-            campaign_leads = CampaignLead.objects.filter(campaign=campaign)
-            
-            if campaign_leads.exists():
-                # Create a link for each campaign lead
-                for campaign_lead in campaign_leads:
-                    # Create a new Link object for each lead
-                    link = Link(
-                        campaign=campaign,
-                        campaign_lead=campaign_lead,
-                        purpose=obj.purpose,
-                        description=obj.description,
-                        url=obj.url,
-                        utm_source=obj.utm_source,
-                        utm_medium=obj.utm_medium,
-                        utm_campaign=obj.utm_campaign,
-                        utm_term=obj.utm_term,
-                        utm_content=obj.utm_content
-                    )
-                    # Save it to generate unique ref and apply other logic
-                    link.save()
-                
-                # Show a success message
-                self.message_user(
-                    request, 
-                    f"Created {campaign_leads.count()} links for campaign leads in '{campaign.name}'",
-                    level=messages.SUCCESS
-                )
-                
-                # Don't save the original object
-                return
-            else:
-                # No campaign leads found
-                self.message_user(
-                    request,
-                    f"No campaign leads found for campaign '{campaign.name}'",
-                    level=messages.WARNING
-                )
-        
-        # Normal save for a single link
-        super().save_model(request, obj, form, change)
-
 
 
 
