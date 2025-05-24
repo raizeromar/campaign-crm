@@ -444,6 +444,9 @@ class MessageAssignment(models.Model):
         # Set campaign from campaign_lead if not explicitly set
         if self.campaign_lead and not self.campaign:
             self.campaign = self.campaign_lead.campaign
+
+        if not self.personlized_msg:
+            self.personlized_msg = self.get_personalized_content() 
             
         # First save to get an ID if this is a new assignment
         if not self.id:
