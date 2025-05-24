@@ -1077,8 +1077,10 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
                 )
                 return
                 
-            # Get all campaign leads for this campaign
-            campaign_leads = CampaignLead.objects.filter(campaign=campaign)
+            # Get all campaign leads for this campaign that don't already have this message assigned
+            campaign_leads = CampaignLead.objects.filter(campaign=campaign).exclude(
+                id__in=MessageAssignment.objects.filter(campaign=campaign, message=message).values('campaign_lead_id')
+            )
             
             if campaign_leads.exists():
                 # Get UTM parameters from form
@@ -1142,6 +1144,18 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
         
         # Normal save for a single message assignment
         if not change:
+            # Check if this campaign lead already has this message assigned
+            if obj.campaign_lead and obj.message and MessageAssignment.objects.filter(
+                campaign_lead=obj.campaign_lead, 
+                message=obj.message
+            ).exists():
+                self.message_user(
+                    request,
+                    f"Lead '{obj.campaign_lead.lead}' already has message '{obj.message.subject}' assigned",
+                    level=messages.WARNING
+                )
+                return
+                
             # For new assignments, save first to get an ID
             super().save_model(request, obj, form, change)
             
