@@ -536,6 +536,17 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
     list_filter = ('responded', 'scheduled_at', 'sent_at')
     search_fields = ('campaign_lead__lead__full_name', 'message__subject')
     
+    fieldsets = (
+        ('Message Assignment', {
+            'fields': ('campaign_lead', 'message', 'personlized_msg', 'scheduled_at', 'responded', 'responded_content')
+        }),
+        ('Tracking Link Parameters', {
+            'classes': ('collapse',),
+            'description': 'Customize the tracking link for this message',
+            'fields': ('utm_source', 'utm_medium', 'utm_term', 'utm_content', 'description')
+        }),
+    )
+    
     def link_info(self, obj):
         """Display link information if available"""
         if obj.url:
@@ -583,7 +594,8 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
                 utm_source=utm_source or "campaign",
                 utm_medium=utm_medium or "email",
                 utm_term=utm_term,
-                utm_content=utm_content
+                utm_content=utm_content,
+                description=description
             )
             link.save()
             
