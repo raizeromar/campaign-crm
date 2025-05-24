@@ -6,13 +6,14 @@ from django.contrib.admin import SimpleListFilter
 from django.http import HttpResponseRedirect, JsonResponse
 from django.contrib import messages
 from django.core.exceptions import ValidationError
+from django.urls import path
+from urllib.parse import unquote
 from .models import (
     Product, Campaign, Lead, NewsletterSubscriber,
     CampaignLead, Message, Link, MessageAssignment, CampaignStats
 )
 import logging
 from django.conf import settings
-from django.urls import path
 
 # Configure logger
 logger = logging.getLogger(__name__)
@@ -909,12 +910,21 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
         
     def change_view(self, request, object_id, form_url='', extra_context=None):
         extra_context = extra_context or {}
+        
+        # Get the object being edited
+        obj = self.get_object(request, unquote(object_id))
+        
         extra_context['campaign_lead_filter_js'] = """
         <script type="text/javascript">
             (function($) {
                 $(document).ready(function() {
+                    // Store initial values to restore after AJAX calls
+                    var initialCampaignId = %s;
+                    var initialCampaignLeadId = %s;
+                    var initialMessageId = %s;
+                    
                     // Function to update campaign leads dropdown
-                    function updateCampaignLeads(campaignId) {
+                    function updateCampaignLeads(campaignId, selectCampaignLeadId) {
                         if (!campaignId) {
                             // Clear the dropdown if no campaign is selected
                             var $campaignLeadSelect = $('#id_campaign_lead');
@@ -940,9 +950,14 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
                                 
                                 // Add options for each campaign lead
                                 $.each(data.campaign_leads, function(i, item) {
-                                    $campaignLeadSelect.append(
-                                        $('<option></option>').val(item.id).text(item.text)
-                                    );
+                                    var option = $('<option></option>').val(item.id).text(item.text);
+                                    
+                                    // Select the option if it matches the initial value
+                                    if (selectCampaignLeadId && item.id == selectCampaignLeadId) {
+                                        option.attr('selected', 'selected');
+                                    }
+                                    
+                                    $campaignLeadSelect.append(option);
                                 });
                                 
                                 // Enable the dropdown
@@ -957,7 +972,7 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
                     }
                     
                     // Function to update messages dropdown
-                    function updateMessages(campaignId) {
+                    function updateMessages(campaignId, selectMessageId) {
                         if (!campaignId) {
                             // Clear the dropdown if no campaign is selected
                             var $messageSelect = $('#id_message');
@@ -983,9 +998,14 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
                                 
                                 // Add options for each message
                                 $.each(data.messages, function(i, item) {
-                                    $messageSelect.append(
-                                        $('<option></option>').val(item.id).text(item.text)
-                                    );
+                                    var option = $('<option></option>').val(item.id).text(item.text);
+                                    
+                                    // Select the option if it matches the initial value
+                                    if (selectMessageId && item.id == selectMessageId) {
+                                        option.attr('selected', 'selected');
+                                    }
+                                    
+                                    $messageSelect.append(option);
                                 });
                                 
                                 // Enable the dropdown
@@ -1002,20 +1022,28 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
                     // When campaign select changes, update both dropdowns
                     $('#id_campaign').on('change', function() {
                         var campaignId = $(this).val();
-                        updateCampaignLeads(campaignId);
-                        updateMessages(campaignId);
+                        updateCampaignLeads(campaignId, null);
+                        updateMessages(campaignId, null);
                     });
                     
-                    // Initial load if campaign is already selected
-                    var initialCampaignId = $('#id_campaign').val();
+                    // Set the initial campaign value
                     if (initialCampaignId) {
-                        updateCampaignLeads(initialCampaignId);
-                        updateMessages(initialCampaignId);
+                        // Find the campaign option and select it
+                        $('#id_campaign option[value="' + initialCampaignId + '"]').prop('selected', true);
+                        
+                        // Update the dependent dropdowns with initial values
+                        updateCampaignLeads(initialCampaignId, initialCampaignLeadId);
+                        updateMessages(initialCampaignId, initialMessageId);
                     }
                 });
             })(django.jQuery);
         </script>
-        """
+        """ % (
+            obj.campaign_id or 'null',
+            obj.campaign_lead_id or 'null',
+            obj.message_id or 'null'
+        )
+        
         return super().change_view(request, object_id, form_url, extra_context)
     
     def link_info(self, obj):
