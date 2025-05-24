@@ -412,6 +412,31 @@ class LinkAdmin(admin.ModelAdmin):
     list_filter = ('campaign', 'purpose', 'visit_count')
     search_fields = ('url', 'utm_campaign', 'ref', 'description')
     
+    def get_form(self, request, obj=None, **kwargs):
+        """
+        Override get_form to filter campaign_lead based on selected campaign
+        """
+        form = super().get_form(request, obj, **kwargs)
+        
+        # Get the campaign_id from the request or the object
+        campaign_id = request.GET.get('campaign')
+        
+        # If we're in a POST request, get the campaign from the POST data
+        if request.method == 'POST':
+            campaign_id = request.POST.get('campaign')
+        
+        # If still no campaign_id but we have an object, use its campaign
+        if not campaign_id and obj and obj.campaign:
+            campaign_id = obj.campaign.id
+            
+        # Filter campaign_lead based on the campaign
+        if campaign_id:
+            form.base_fields['campaign_lead'].queryset = CampaignLead.objects.filter(campaign_id=campaign_id)
+        else:
+            form.base_fields['campaign_lead'].queryset = CampaignLead.objects.none()
+            
+        return form
+    
     def tracking_url(self, obj):
         """Display the tracking URL with a copy button"""
         if obj.ref:
@@ -429,10 +454,105 @@ class LinkAdmin(admin.ModelAdmin):
             return format_html('<a href="/admin/campaign/messageassignment/?url__id__exact={}">{} assignments</a>', obj.id, count)
         return "0"
     message_assignments_count.short_description = 'Used in Messages'
-
-
-
-
+    
+    class Media:
+        js = ('admin/js/jquery.init.js',)
+        
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['campaign_lead_filter_js'] = """
+        <script type="text/javascript">
+            (function($) {
+                $(document).ready(function() {
+                    // When campaign select changes, reload the page with the campaign parameter
+                    $('#id_campaign').on('change', function() {
+                        var campaignId = $(this).val();
+                        var currentUrl = window.location.href;
+                        
+                        // Remove existing campaign parameter if any
+                        currentUrl = currentUrl.replace(/[?&]campaign=\\d+/, '');
+                        
+                        // Add the new campaign parameter
+                        if (campaignId) {
+                            if (currentUrl.indexOf('?') > -1) {
+                                currentUrl += '&campaign=' + campaignId;
+                            } else {
+                                currentUrl += '?campaign=' + campaignId;
+                            }
+                        }
+                        
+                        // Reload the page
+                        window.location.href = currentUrl;
+                    });
+                });
+            })(django.jQuery);
+        </script>
+        """
+        return super().changelist_view(request, extra_context)
+        
+    def add_view(self, request, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['campaign_lead_filter_js'] = """
+        <script type="text/javascript">
+            (function($) {
+                $(document).ready(function() {
+                    // When campaign select changes, reload the page with the campaign parameter
+                    $('#id_campaign').on('change', function() {
+                        var campaignId = $(this).val();
+                        var currentUrl = window.location.href;
+                        
+                        // Remove existing campaign parameter if any
+                        currentUrl = currentUrl.replace(/[?&]campaign=\\d+/, '');
+                        
+                        // Add the new campaign parameter
+                        if (campaignId) {
+                            if (currentUrl.indexOf('?') > -1) {
+                                currentUrl += '&campaign=' + campaignId;
+                            } else {
+                                currentUrl += '?campaign=' + campaignId;
+                            }
+                        }
+                        
+                        // Reload the page
+                        window.location.href = currentUrl;
+                    });
+                });
+            })(django.jQuery);
+        </script>
+        """
+        return super().add_view(request, form_url, extra_context)
+        
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['campaign_lead_filter_js'] = """
+        <script type="text/javascript">
+            (function($) {
+                $(document).ready(function() {
+                    // When campaign select changes, reload the page with the campaign parameter
+                    $('#id_campaign').on('change', function() {
+                        var campaignId = $(this).val();
+                        var currentUrl = window.location.href;
+                        
+                        // Remove existing campaign parameter if any
+                        currentUrl = currentUrl.replace(/[?&]campaign=\\d+/, '');
+                        
+                        // Add the new campaign parameter
+                        if (campaignId) {
+                            if (currentUrl.indexOf('?') > -1) {
+                                currentUrl += '&campaign=' + campaignId;
+                            } else {
+                                currentUrl += '?campaign=' + campaignId;
+                            }
+                        }
+                        
+                        // Reload the page
+                        window.location.href = currentUrl;
+                    });
+                });
+            })(django.jQuery);
+        </script>
+        """
+        return super().change_view(request, object_id, form_url, extra_context)
 
 class MessageAssignmentAdminForm(forms.ModelForm):
     create_for_all_leads = forms.BooleanField(
