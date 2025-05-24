@@ -502,8 +502,36 @@ class LinkAdmin(admin.ModelAdmin):
 
 
 
+class MessageAssignmentAdminForm(forms.ModelForm):
+    utm_source = forms.CharField(max_length=100, required=False, 
+                                help_text="Source of the traffic (default: campaign)")
+    utm_medium = forms.CharField(max_length=100, required=False, 
+                               help_text="Marketing medium (default: email)")
+    utm_term = forms.CharField(max_length=100, required=False, 
+                             help_text="Keywords for paid search")
+    utm_content = forms.CharField(max_length=100, required=False, 
+                                help_text="Content identifier (default: email_[message_id])")
+    
+    description = forms.CharField(max_length=100, required=False, 
+                                help_text="Optional description of this link's purpose")
+    
+    class Meta:
+        model = MessageAssignment
+        fields = '__all__'
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # If this is an existing object with a URL, populate UTM fields
+        if self.instance and self.instance.pk and self.instance.url:
+            self.fields['utm_source'].initial = self.instance.url.utm_source
+            self.fields['utm_medium'].initial = self.instance.url.utm_medium
+            self.fields['utm_term'].initial = self.instance.url.utm_term
+            self.fields['utm_content'].initial = self.instance.url.utm_content
+            self.fields['description'].initial = self.instance.url.description
+
 @admin.register(MessageAssignment)
 class MessageAssignmentAdmin(admin.ModelAdmin):
+    form = MessageAssignmentAdminForm
     list_display = ('campaign_lead', 'message', 'link_info', 'scheduled_at', 'sent_at', 'responded')
     list_filter = ('responded', 'scheduled_at', 'sent_at')
     search_fields = ('campaign_lead__lead__full_name', 'message__subject')
@@ -522,6 +550,46 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
             )
         return "No link"
     link_info.short_description = 'Tracking Link'
+    
+    def save_model(self, request, obj, form, change):
+        # First save the message assignment to get an ID
+        super().save_model(request, obj, form, change)
+        
+        # Get UTM parameters from form
+        utm_source = form.cleaned_data.get('utm_source')
+        utm_medium = form.cleaned_data.get('utm_medium')
+        utm_term = form.cleaned_data.get('utm_term')
+        utm_content = form.cleaned_data.get('utm_content') or f"email_{obj.id}"
+        description = form.cleaned_data.get('description')
+        
+        # Create or update the link
+        if obj.url:
+            # Update existing link
+            link = obj.url
+            if utm_source:
+                link.utm_source = utm_source
+            if utm_medium:
+                link.utm_medium = utm_medium
+            link.utm_term = utm_term
+            link.utm_content = utm_content
+            link.description = description
+            link.save()
+        else:
+            # Create new link
+            link = Link(
+                campaign=obj.campaign_lead.campaign,
+                campaign_lead=obj.campaign_lead,
+                url=obj.campaign_lead.campaign.product.landing_page_url,
+                utm_source=utm_source or "campaign",
+                utm_medium=utm_medium or "email",
+                utm_term=utm_term,
+                utm_content=utm_content
+            )
+            link.save()
+            
+            # Attach link to message assignment
+            obj.url = link
+            obj.save()
 
 
 
