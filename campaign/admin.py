@@ -503,6 +503,18 @@ class LinkAdmin(admin.ModelAdmin):
 
 
 class MessageAssignmentAdminForm(forms.ModelForm):
+    create_for_all_leads = forms.BooleanField(
+        required=False,
+        label="Create for all campaign leads",
+        help_text="If checked, this message will be assigned to all leads in the selected campaign"
+    )
+    
+    campaign = forms.ModelChoiceField(
+        queryset=Campaign.objects.all(),
+        required=False,
+        help_text="Select campaign when creating assignments for all leads"
+    )
+    
     utm_source = forms.CharField(max_length=100, required=False, 
                                 help_text="Source of the traffic (default: campaign)")
     utm_medium = forms.CharField(max_length=100, required=False, 
@@ -521,6 +533,9 @@ class MessageAssignmentAdminForm(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # Make campaign_lead not required in the form (we'll validate in clean)
+        self.fields['campaign_lead'].required = False
+        
         # If this is an existing object with a URL, populate UTM fields
         if self.instance and self.instance.pk and self.instance.url:
             self.fields['utm_source'].initial = self.instance.url.utm_source
@@ -528,6 +543,27 @@ class MessageAssignmentAdminForm(forms.ModelForm):
             self.fields['utm_term'].initial = self.instance.url.utm_term
             self.fields['utm_content'].initial = self.instance.url.utm_content
             self.fields['description'].initial = self.instance.url.description
+            
+        # If this is an existing message assignment, hide the create_for_all_leads field
+        if self.instance and self.instance.pk:
+            self.fields['create_for_all_leads'].widget = forms.HiddenInput()
+            self.fields['campaign'].widget = forms.HiddenInput()
+            
+    def clean(self):
+        cleaned_data = super().clean()
+        campaign_lead = cleaned_data.get('campaign_lead')
+        create_for_all_leads = cleaned_data.get('create_for_all_leads')
+        campaign = cleaned_data.get('campaign')
+        
+        # If creating for all leads, campaign is required
+        if create_for_all_leads and not campaign:
+            self.add_error('campaign', 'Please select a campaign when creating assignments for all leads')
+            
+        # If not creating for all leads, campaign_lead is required
+        if not create_for_all_leads and not campaign_lead:
+            self.add_error('campaign_lead', 'This field is required when not creating for all leads')
+            
+        return cleaned_data
 
 @admin.register(MessageAssignment)
 class MessageAssignmentAdmin(admin.ModelAdmin):
@@ -538,7 +574,7 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
     
     fieldsets = (
         ('Message Assignment', {
-            'fields': ('campaign_lead', 'message', 'personlized_msg', 'scheduled_at', 'responded', 'responded_content')
+            'fields': ('campaign_lead', 'message', 'create_for_all_leads', 'campaign', 'personlized_msg', 'scheduled_at', 'responded', 'responded_content')
         }),
         ('Tracking Link Parameters', {
             'classes': ('collapse',),
@@ -563,7 +599,82 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
     link_info.short_description = 'Tracking Link'
     
     def save_model(self, request, obj, form, change):
-        # First save the message assignment to get an ID
+        create_for_all_leads = form.cleaned_data.get('create_for_all_leads')
+        
+        if create_for_all_leads and not change:
+            # Get the message and campaign
+            message = obj.message
+            campaign = form.cleaned_data.get('campaign')
+            
+            if not campaign:
+                self.message_user(
+                    request,
+                    "Please select a campaign when creating assignments for all leads",
+                    level=messages.ERROR
+                )
+                return
+                
+            # Get all campaign leads for this campaign
+            campaign_leads = CampaignLead.objects.filter(campaign=campaign)
+            
+            if campaign_leads.exists():
+                # Get UTM parameters from form
+                utm_source = form.cleaned_data.get('utm_source')
+                utm_medium = form.cleaned_data.get('utm_medium')
+                utm_term = form.cleaned_data.get('utm_term')
+                description = form.cleaned_data.get('description')
+                
+                # Create a message assignment for each campaign lead
+                created_count = 0
+                for campaign_lead in campaign_leads:
+                    # Create a new MessageAssignment for each lead
+                    message_assignment = MessageAssignment(
+                        campaign_lead=campaign_lead,
+                        message=message,
+                        personlized_msg=obj.personlized_msg,
+                        scheduled_at=obj.scheduled_at
+                    )
+                    message_assignment.save()
+                    
+                    # Create a link for this message assignment
+                    utm_content = form.cleaned_data.get('utm_content') or f"email_{message_assignment.id}"
+                    link = Link(
+                        campaign=campaign,
+                        campaign_lead=campaign_lead,
+                        url=campaign.product.landing_page_url,
+                        utm_source=utm_source or "campaign",
+                        utm_medium=utm_medium or "email",
+                        utm_term=utm_term,
+                        utm_content=utm_content,
+                        description=description
+                    )
+                    link.save()
+                    
+                    # Attach link to message assignment
+                    message_assignment.url = link
+                    message_assignment.save()
+                    
+                    created_count += 1
+                
+                # Show a success message
+                self.message_user(
+                    request, 
+                    f"Created {created_count} message assignments for campaign leads in '{campaign.name}'",
+                    level=messages.SUCCESS
+                )
+                
+                # Don't save the original object
+                return
+            else:
+                # No campaign leads found
+                self.message_user(
+                    request,
+                    f"No campaign leads found for campaign '{campaign.name}'",
+                    level=messages.WARNING
+                )
+                return
+        
+        # Normal save for a single message assignment
         super().save_model(request, obj, form, change)
         
         # Get UTM parameters from form

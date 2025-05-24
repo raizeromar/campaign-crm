@@ -403,8 +403,6 @@ class MessageAssignment(models.Model):
     
     scheduled_at = models.DateTimeField(null=True, blank=True)
     sent_at = models.DateTimeField(null=True, blank=True)
-    #opened_at = models.DateTimeField(null=True, blank=True)
-    #clicked_at = models.DateTimeField(null=True, blank=True)
 
     responded = models.BooleanField(default=False)
     responded_content = models.TextField(blank=True)
@@ -434,6 +432,8 @@ class MessageAssignment(models.Model):
         return content
 
     def __str__(self):
+        if not hasattr(self, 'campaign_lead') or self.campaign_lead is None:
+            return f"New message assignment - {self.message.subject if hasattr(self, 'message') else 'No message'}"
         return f"{self.campaign_lead} - {self.message.subject}"
     
 
