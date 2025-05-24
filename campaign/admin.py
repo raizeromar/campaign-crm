@@ -1154,8 +1154,11 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
                     f"Lead '{obj.campaign_lead.lead}' already has message '{obj.message.subject}' assigned",
                     level=messages.WARNING
                 )
+                # Set an attribute on the request to indicate we've handled this
+                # This will be checked in response_add to prevent the default success message
+                request._message_assignment_duplicate = True
                 return
-                
+            
             # For new assignments, save first to get an ID
             super().save_model(request, obj, form, change)
             
@@ -1210,7 +1213,11 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
                 
                 link.save()
 
-
-
-
-
+    def response_add(self, request, obj, post_url_continue=None):
+        # If we've marked this as a duplicate, redirect without the success message
+        if hasattr(request, '_message_assignment_duplicate') and request._message_assignment_duplicate:
+            from django.http import HttpResponseRedirect
+            return HttpResponseRedirect("../")
+        
+        # Otherwise, proceed with the default behavior
+        return super().response_add(request, obj, post_url_continue)
