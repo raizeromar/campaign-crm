@@ -1075,6 +1075,8 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
                     "Please select a campaign when creating assignments for all leads",
                     level=messages.ERROR
                 )
+                # Set flag to prevent default success message
+                request._message_assignment_duplicate = True
                 return
                 
             # Get all campaign leads for this campaign that don't already have this message assigned
@@ -1130,6 +1132,9 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
                     level=messages.SUCCESS
                 )
                 
+                # Set flag to prevent default success message
+                request._message_assignment_duplicate = True
+                
                 # Redirect to the message assignment list
                 from django.http import HttpResponseRedirect
                 return HttpResponseRedirect("../")
@@ -1140,6 +1145,8 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
                     f"No campaign leads found for campaign '{campaign.name}'",
                     level=messages.WARNING
                 )
+                # Set flag to prevent default success message
+                request._message_assignment_duplicate = True
                 return
         
         # Normal save for a single message assignment
