@@ -684,6 +684,7 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
         urls = super().get_urls()
         custom_urls = [
             path('get-campaign-leads/', self.admin_site.admin_view(self.get_campaign_leads), name='get_campaign_leads'),
+            path('get-campaign-messages/', self.admin_site.admin_view(self.get_campaign_messages), name='get_campaign_messages'),
         ]
         return custom_urls + urls
     
@@ -698,9 +699,25 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
         
         return JsonResponse({'campaign_leads': leads_data})
     
+    def get_campaign_messages(self, request):
+        """AJAX view to get messages for a campaign's product"""
+        campaign_id = request.GET.get('campaign_id')
+        if not campaign_id:
+            return JsonResponse({'error': 'No campaign ID provided'}, status=400)
+        
+        try:
+            campaign = Campaign.objects.get(id=campaign_id)
+            product = campaign.product
+            messages = Message.objects.filter(product=product)
+            messages_data = [{'id': m.id, 'text': str(m)} for m in messages]
+            
+            return JsonResponse({'messages': messages_data})
+        except Campaign.DoesNotExist:
+            return JsonResponse({'error': 'Campaign not found'}, status=404)
+    
     def get_form(self, request, obj=None, **kwargs):
         """
-        Override get_form to filter campaign_lead based on selected campaign
+        Override get_form to filter campaign_lead and message based on selected campaign
         """
         form = super().get_form(request, obj, **kwargs)
         
@@ -718,8 +735,16 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
         # Filter campaign_lead based on the campaign
         if campaign_id:
             form.base_fields['campaign_lead'].queryset = CampaignLead.objects.filter(campaign_id=campaign_id)
+            
+            # Filter messages based on the campaign's product
+            try:
+                campaign = Campaign.objects.get(id=campaign_id)
+                form.base_fields['message'].queryset = Message.objects.filter(product=campaign.product)
+            except Campaign.DoesNotExist:
+                form.base_fields['message'].queryset = Message.objects.none()
         else:
             form.base_fields['campaign_lead'].queryset = CampaignLead.objects.none()
+            form.base_fields['message'].queryset = Message.objects.all()
             
         return form
     
@@ -804,16 +829,61 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
                         });
                     }
                     
-                    // When campaign select changes, update campaign leads
+                    // Function to update messages dropdown
+                    function updateMessages(campaignId) {
+                        if (!campaignId) {
+                            // Clear the dropdown if no campaign is selected
+                            var $messageSelect = $('#id_message');
+                            $messageSelect.empty();
+                            $messageSelect.append('<option value="">---------</option>');
+                            return;
+                        }
+                        
+                        // Show loading indicator
+                        $('#id_message').prop('disabled', true);
+                        
+                        // Make AJAX request to get messages for this campaign's product
+                        $.ajax({
+                            url: '/admin/campaign/messageassignment/get-campaign-messages/',
+                            data: {
+                                'campaign_id': campaignId
+                            },
+                            dataType: 'json',
+                            success: function(data) {
+                                var $messageSelect = $('#id_message');
+                                $messageSelect.empty();
+                                $messageSelect.append('<option value="">---------</option>');
+                                
+                                // Add options for each message
+                                $.each(data.messages, function(i, item) {
+                                    $messageSelect.append(
+                                        $('<option></option>').val(item.id).text(item.text)
+                                    );
+                                });
+                                
+                                // Enable the dropdown
+                                $messageSelect.prop('disabled', false);
+                            },
+                            error: function(xhr, status, error) {
+                                console.error("Error loading messages:", error);
+                                // Enable the dropdown even on error
+                                $('#id_message').prop('disabled', false);
+                            }
+                        });
+                    }
+                    
+                    // When campaign select changes, update both dropdowns
                     $('#id_campaign').on('change', function() {
                         var campaignId = $(this).val();
                         updateCampaignLeads(campaignId);
+                        updateMessages(campaignId);
                     });
                     
                     // Initial load if campaign is already selected
                     var initialCampaignId = $('#id_campaign').val();
                     if (initialCampaignId) {
                         updateCampaignLeads(initialCampaignId);
+                        updateMessages(initialCampaignId);
                     }
                     
                     // Toggle visibility of campaign_lead field based on create_for_all_leads
@@ -886,16 +956,61 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
                         });
                     }
                     
-                    // When campaign select changes, update campaign leads
+                    // Function to update messages dropdown
+                    function updateMessages(campaignId) {
+                        if (!campaignId) {
+                            // Clear the dropdown if no campaign is selected
+                            var $messageSelect = $('#id_message');
+                            $messageSelect.empty();
+                            $messageSelect.append('<option value="">---------</option>');
+                            return;
+                        }
+                        
+                        // Show loading indicator
+                        $('#id_message').prop('disabled', true);
+                        
+                        // Make AJAX request to get messages for this campaign's product
+                        $.ajax({
+                            url: '/admin/campaign/messageassignment/get-campaign-messages/',
+                            data: {
+                                'campaign_id': campaignId
+                            },
+                            dataType: 'json',
+                            success: function(data) {
+                                var $messageSelect = $('#id_message');
+                                $messageSelect.empty();
+                                $messageSelect.append('<option value="">---------</option>');
+                                
+                                // Add options for each message
+                                $.each(data.messages, function(i, item) {
+                                    $messageSelect.append(
+                                        $('<option></option>').val(item.id).text(item.text)
+                                    );
+                                });
+                                
+                                // Enable the dropdown
+                                $messageSelect.prop('disabled', false);
+                            },
+                            error: function(xhr, status, error) {
+                                console.error("Error loading messages:", error);
+                                // Enable the dropdown even on error
+                                $('#id_message').prop('disabled', false);
+                            }
+                        });
+                    }
+                    
+                    // When campaign select changes, update both dropdowns
                     $('#id_campaign').on('change', function() {
                         var campaignId = $(this).val();
                         updateCampaignLeads(campaignId);
+                        updateMessages(campaignId);
                     });
                     
                     // Initial load if campaign is already selected
                     var initialCampaignId = $('#id_campaign').val();
                     if (initialCampaignId) {
                         updateCampaignLeads(initialCampaignId);
+                        updateMessages(initialCampaignId);
                     }
                 });
             })(django.jQuery);
