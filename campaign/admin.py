@@ -613,12 +613,6 @@ class MessageAssignmentAdminForm(forms.ModelForm):
         help_text="If checked, this message will be assigned to all leads in the selected campaign"
     )
     
-    campaign = forms.ModelChoiceField(
-        queryset=Campaign.objects.all(),
-        required=False,
-        help_text="Select campaign when creating assignments for all leads"
-    )
-    
     utm_source = forms.CharField(max_length=100, required=False, 
                                 help_text="Source of the traffic (default: campaign)")
     utm_medium = forms.CharField(max_length=100, required=False, 
@@ -651,7 +645,6 @@ class MessageAssignmentAdminForm(forms.ModelForm):
         # If this is an existing message assignment, hide the create_for_all_leads field
         if self.instance and self.instance.pk:
             self.fields['create_for_all_leads'].widget = forms.HiddenInput()
-            self.fields['campaign'].widget = forms.HiddenInput()
             
     def clean(self):
         cleaned_data = super().clean()
@@ -663,9 +656,9 @@ class MessageAssignmentAdminForm(forms.ModelForm):
         if create_for_all_leads and not campaign:
             self.add_error('campaign', 'Please select a campaign when creating assignments for all leads')
             
-        # If not creating for all leads, campaign_lead is required
-        if not create_for_all_leads and not campaign_lead:
-            self.add_error('campaign_lead', 'This field is required when not creating for all leads')
+        # If not creating for all leads, either campaign_lead or campaign is required
+        if not create_for_all_leads and not campaign_lead and not campaign:
+            self.add_error('campaign_lead', 'Either Campaign Lead or Campaign must be selected')
             
         return cleaned_data
 
@@ -673,12 +666,12 @@ class MessageAssignmentAdminForm(forms.ModelForm):
 class MessageAssignmentAdmin(admin.ModelAdmin):
     form = MessageAssignmentAdminForm
     list_display = ('campaign_lead', 'message', 'link_info', 'scheduled_at', 'sent_at', 'responded')
-    list_filter = ('responded', 'scheduled_at', 'sent_at')
+    list_filter = ('campaign', 'responded', 'scheduled_at', 'sent_at')
     search_fields = ('campaign_lead__lead__full_name', 'message__subject')
     
     fieldsets = (
         ('Message Assignment', {
-            'fields': ('campaign_lead', 'message', 'create_for_all_leads', 'campaign', 'personlized_msg', 'scheduled_at', 'responded', 'responded_content')
+            'fields': ('campaign', 'campaign_lead', 'message', 'create_for_all_leads', 'personlized_msg', 'scheduled_at', 'responded', 'responded_content')
         }),
         ('Tracking Link Parameters', {
             'classes': ('collapse',),
@@ -686,6 +679,229 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
             'fields': ('utm_source', 'utm_medium', 'utm_term', 'utm_content', 'description')
         }),
     )
+    
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path('get-campaign-leads/', self.admin_site.admin_view(self.get_campaign_leads), name='get_campaign_leads'),
+        ]
+        return custom_urls + urls
+    
+    def get_campaign_leads(self, request):
+        """AJAX view to get campaign leads for a campaign"""
+        campaign_id = request.GET.get('campaign_id')
+        if not campaign_id:
+            return JsonResponse({'error': 'No campaign ID provided'}, status=400)
+        
+        campaign_leads = CampaignLead.objects.filter(campaign_id=campaign_id)
+        leads_data = [{'id': cl.id, 'text': str(cl)} for cl in campaign_leads]
+        
+        return JsonResponse({'campaign_leads': leads_data})
+    
+    def get_form(self, request, obj=None, **kwargs):
+        """
+        Override get_form to filter campaign_lead based on selected campaign
+        """
+        form = super().get_form(request, obj, **kwargs)
+        
+        # Get the campaign_id from the request or the object
+        campaign_id = request.GET.get('campaign')
+        
+        # If we're in a POST request, get the campaign from the POST data
+        if request.method == 'POST':
+            campaign_id = request.POST.get('campaign')
+        
+        # If still no campaign_id but we have an object, use its campaign
+        if not campaign_id and obj and obj.campaign:
+            campaign_id = obj.campaign.id
+            
+        # Filter campaign_lead based on the campaign
+        if campaign_id:
+            form.base_fields['campaign_lead'].queryset = CampaignLead.objects.filter(campaign_id=campaign_id)
+        else:
+            form.base_fields['campaign_lead'].queryset = CampaignLead.objects.none()
+            
+        return form
+    
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['campaign_lead_filter_js'] = """
+        <script type="text/javascript">
+            (function($) {
+                $(document).ready(function() {
+                    // When campaign select changes, reload the page with the campaign parameter
+                    $('#id_campaign').on('change', function() {
+                        var campaignId = $(this).val();
+                        var currentUrl = window.location.href;
+                        
+                        // Remove existing campaign parameter if any
+                        currentUrl = currentUrl.replace(/[?&]campaign=\\d+/, '');
+                        
+                        // Add the new campaign parameter
+                        if (campaignId) {
+                            if (currentUrl.indexOf('?') > -1) {
+                                currentUrl += '&campaign=' + campaignId;
+                            } else {
+                                currentUrl += '?campaign=' + campaignId;
+                            }
+                        }
+                        
+                        // Reload the page
+                        window.location.href = currentUrl;
+                    });
+                });
+            })(django.jQuery);
+        </script>
+        """
+        return super().changelist_view(request, extra_context)
+        
+    def add_view(self, request, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['campaign_lead_filter_js'] = """
+        <script type="text/javascript">
+            (function($) {
+                $(document).ready(function() {
+                    // Function to update campaign leads dropdown
+                    function updateCampaignLeads(campaignId) {
+                        if (!campaignId) {
+                            // Clear the dropdown if no campaign is selected
+                            var $campaignLeadSelect = $('#id_campaign_lead');
+                            $campaignLeadSelect.empty();
+                            $campaignLeadSelect.append('<option value="">---------</option>');
+                            return;
+                        }
+                        
+                        // Show loading indicator
+                        $('#id_campaign_lead').prop('disabled', true);
+                        
+                        // Make AJAX request to get campaign leads
+                        $.ajax({
+                            url: '/admin/campaign/messageassignment/get-campaign-leads/',
+                            data: {
+                                'campaign_id': campaignId
+                            },
+                            dataType: 'json',
+                            success: function(data) {
+                                var $campaignLeadSelect = $('#id_campaign_lead');
+                                $campaignLeadSelect.empty();
+                                $campaignLeadSelect.append('<option value="">---------</option>');
+                                
+                                // Add options for each campaign lead
+                                $.each(data.campaign_leads, function(i, item) {
+                                    $campaignLeadSelect.append(
+                                        $('<option></option>').val(item.id).text(item.text)
+                                    );
+                                });
+                                
+                                // Enable the dropdown
+                                $campaignLeadSelect.prop('disabled', false);
+                            },
+                            error: function(xhr, status, error) {
+                                console.error("Error loading campaign leads:", error);
+                                // Enable the dropdown even on error
+                                $('#id_campaign_lead').prop('disabled', false);
+                            }
+                        });
+                    }
+                    
+                    // When campaign select changes, update campaign leads
+                    $('#id_campaign').on('change', function() {
+                        var campaignId = $(this).val();
+                        updateCampaignLeads(campaignId);
+                    });
+                    
+                    // Initial load if campaign is already selected
+                    var initialCampaignId = $('#id_campaign').val();
+                    if (initialCampaignId) {
+                        updateCampaignLeads(initialCampaignId);
+                    }
+                    
+                    // Toggle visibility of campaign_lead field based on create_for_all_leads
+                    $('#id_create_for_all_leads').on('change', function() {
+                        if ($(this).is(':checked')) {
+                            // Hide campaign_lead field when creating for all leads
+                            $('#id_campaign_lead').closest('.form-row').hide();
+                        } else {
+                            // Show campaign_lead field when not creating for all leads
+                            $('#id_campaign_lead').closest('.form-row').show();
+                        }
+                    });
+                    
+                    // Initial toggle based on checkbox state
+                    if ($('#id_create_for_all_leads').is(':checked')) {
+                        $('#id_campaign_lead').closest('.form-row').hide();
+                    }
+                });
+            })(django.jQuery);
+        </script>
+        """
+        return super().add_view(request, form_url, extra_context)
+        
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['campaign_lead_filter_js'] = """
+        <script type="text/javascript">
+            (function($) {
+                $(document).ready(function() {
+                    // Function to update campaign leads dropdown
+                    function updateCampaignLeads(campaignId) {
+                        if (!campaignId) {
+                            // Clear the dropdown if no campaign is selected
+                            var $campaignLeadSelect = $('#id_campaign_lead');
+                            $campaignLeadSelect.empty();
+                            $campaignLeadSelect.append('<option value="">---------</option>');
+                            return;
+                        }
+                        
+                        // Show loading indicator
+                        $('#id_campaign_lead').prop('disabled', true);
+                        
+                        // Make AJAX request to get campaign leads
+                        $.ajax({
+                            url: '/admin/campaign/messageassignment/get-campaign-leads/',
+                            data: {
+                                'campaign_id': campaignId
+                            },
+                            dataType: 'json',
+                            success: function(data) {
+                                var $campaignLeadSelect = $('#id_campaign_lead');
+                                $campaignLeadSelect.empty();
+                                $campaignLeadSelect.append('<option value="">---------</option>');
+                                
+                                // Add options for each campaign lead
+                                $.each(data.campaign_leads, function(i, item) {
+                                    $campaignLeadSelect.append(
+                                        $('<option></option>').val(item.id).text(item.text)
+                                    );
+                                });
+                                
+                                // Enable the dropdown
+                                $campaignLeadSelect.prop('disabled', false);
+                            },
+                            error: function(xhr, status, error) {
+                                console.error("Error loading campaign leads:", error);
+                                // Enable the dropdown even on error
+                                $('#id_campaign_lead').prop('disabled', false);
+                            }
+                        });
+                    }
+                    
+                    // When campaign select changes, update campaign leads
+                    $('#id_campaign').on('change', function() {
+                        var campaignId = $(this).val();
+                        updateCampaignLeads(campaignId);
+                    });
+                    
+                    // Initial load if campaign is already selected
+                    var initialCampaignId = $('#id_campaign').val();
+                    if (initialCampaignId) {
+                        updateCampaignLeads(initialCampaignId);
+                    }
+                });
+            })(django.jQuery);
+        </script>
+        """
+        return super().change_view(request, object_id, form_url, extra_context)
     
     def link_info(self, obj):
         """Display link information if available"""
@@ -704,11 +920,11 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
     
     def save_model(self, request, obj, form, change):
         create_for_all_leads = form.cleaned_data.get('create_for_all_leads')
+        campaign = form.cleaned_data.get('campaign')
         
         if create_for_all_leads and not change:
             # Get the message and campaign
             message = obj.message
-            campaign = form.cleaned_data.get('campaign')
             
             if not campaign:
                 self.message_user(
@@ -748,6 +964,7 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
                     # Then create the message assignment with the link already set
                     # This prevents the MessageAssignment.save() method from creating another link
                     message_assignment = MessageAssignment(
+                        campaign=campaign,
                         campaign_lead=campaign_lead,
                         message=message,
                         personlized_msg=obj.personlized_msg,
@@ -793,7 +1010,7 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
             description = form.cleaned_data.get('description')
             
             # Check if a link was already created by the model's save method
-            if not obj.url:
+            if not obj.url and obj.campaign_lead:
                 # Create new link
                 link = Link(
                     campaign=obj.campaign_lead.campaign,
@@ -840,14 +1057,3 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
 
 
 
-
-
-@admin.register(CampaignStats)
-class CampaignStatsAdmin(admin.ModelAdmin):
-    list_display = ('campaign', 'total_leads', 'total_messages_sent', 'open_rate', 'click_rate', 'conversion_rate')
-    readonly_fields = ('open_rate', 'click_rate', 'conversion_rate')
-
-# Customize admin site
-admin.site.site_header = "Campaign Automation Dashboard"
-admin.site.site_title = "Campaign Management"
-admin.site.index_title = "Campaign Analytics & Management"

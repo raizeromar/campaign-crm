@@ -395,9 +395,13 @@ class Link(models.Model):
 
 
 class MessageAssignment(models.Model):
+    # Add campaign field for direct access
+    campaign = models.ForeignKey(Campaign, on_delete=models.CASCADE, null=True, blank=True)
+    
     campaign_lead = models.ForeignKey(CampaignLead, on_delete=models.CASCADE)
     message = models.ForeignKey(Message, on_delete=models.CASCADE)
     url = models.ForeignKey(Link, null=True, blank=True, on_delete=models.SET_NULL, related_name='message_assignments')
+    
 
     personlized_msg = models.TextField(blank=True)
     
@@ -436,14 +440,17 @@ class MessageAssignment(models.Model):
             return f"New message assignment - {self.message.subject if hasattr(self, 'message') else 'No message'}"
         return f"{self.campaign_lead} - {self.message.subject}"
     
-
     def save(self, *args, **kwargs):
+        # Set campaign from campaign_lead if not explicitly set
+        if self.campaign_lead and not self.campaign:
+            self.campaign = self.campaign_lead.campaign
+            
         # First save to get an ID if this is a new assignment
         if not self.id:
             super().save(*args, **kwargs)
             
         # Auto-create a link if one doesn't exist
-        if not self.url:
+        if not self.url and self.campaign_lead:
             # Create a new Link object with proper utm_content using the now-available ID
             link = Link(
                 campaign=self.campaign_lead.campaign,
@@ -460,10 +467,6 @@ class MessageAssignment(models.Model):
             return
         
         super().save(*args, **kwargs)
-    
-
-
-
 
 
 
