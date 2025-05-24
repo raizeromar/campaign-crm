@@ -435,7 +435,32 @@ class MessageAssignment(models.Model):
 
     def __str__(self):
         return f"{self.campaign_lead} - {self.message.subject}"
+    
 
+    def save(self, *args, **kwargs):
+        # First save to get an ID if this is a new assignment
+        if not self.id:
+            super().save(*args, **kwargs)
+            
+        # Auto-create a link if one doesn't exist
+        if not self.url:
+            # Create a new Link object with proper utm_content using the now-available ID
+            link = Link(
+                campaign=self.campaign_lead.campaign,
+                campaign_lead=self.campaign_lead,
+                url=self.campaign_lead.campaign.product.landing_page_url,
+                utm_content=f"email_{self.id}"
+            )
+            # Save it to generate unique ref and apply other logic
+            link.save()
+            self.url = link
+            # Save again with the link
+            kwargs['force_insert'] = False
+            super().save(*args, **kwargs)
+            return
+        
+        super().save(*args, **kwargs)
+    
 
 
 
