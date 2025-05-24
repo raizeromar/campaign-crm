@@ -672,7 +672,7 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
     
     fieldsets = (
         ('Message Assignment', {
-            'fields': ('campaign', 'campaign_lead', 'message', 'create_for_all_leads', 'personlized_msg', 'scheduled_at', 'responded', 'responded_content')
+            'fields': ('campaign', 'campaign_lead', 'message', 'create_for_all_leads', 'personlized_msg_tmp', 'personlized_msg_to_send', 'scheduled_at', 'responded', 'responded_content')
         }),
         ('Tracking Link Parameters', {
             'classes': ('collapse',),
@@ -1114,7 +1114,7 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
                         campaign=campaign,
                         campaign_lead=campaign_lead,
                         message=message,
-                        personlized_msg=obj.personlized_msg,
+                        personlized_msg_tmp=obj.personlized_msg_tmp,
                         scheduled_at=obj.scheduled_at,
                         url=link  # Set the link here to prevent auto-creation
                     )

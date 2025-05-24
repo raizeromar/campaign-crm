@@ -403,7 +403,8 @@ class MessageAssignment(models.Model):
     url = models.ForeignKey(Link, null=True, blank=True, on_delete=models.SET_NULL, related_name='message_assignments')
     
 
-    personlized_msg = models.TextField(blank=True)
+    personlized_msg_tmp = models.TextField(blank=True)
+    personlized_msg_to_send = models.TextField(blank=True)
     
     scheduled_at = models.DateTimeField(null=True, blank=True)
     sent_at = models.DateTimeField(null=True, blank=True)
@@ -417,9 +418,9 @@ class MessageAssignment(models.Model):
             return self.url.get_redirect_url()
         return ""
     
-    def get_personalized_content(self):
+    def get_personalized_content_tmp(self):
         """Get the personalized message content with tracking URL"""
-        content = self.personlized_msg or self.message.content
+        content = self.personlized_msg_tmp or self.message.content
         
         # Replace placeholders with actual values
         if self.campaign_lead and self.campaign_lead.lead:
@@ -445,8 +446,8 @@ class MessageAssignment(models.Model):
         if self.campaign_lead and not self.campaign:
             self.campaign = self.campaign_lead.campaign
 
-        if not self.personlized_msg:
-            self.personlized_msg = self.get_personalized_content() 
+        if not self.personlized_msg_tmp:
+            self.personlized_msg_tmp = self.get_personalized_content_tmp() 
             
         # First save to get an ID if this is a new assignment
         if not self.id:
