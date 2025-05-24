@@ -91,9 +91,16 @@ class Campaign(models.Model):
     def __str__(self):
         return f"{self.name} - {self.product.name}"
 
-
-
-
+    def to_dict_for_ai(self):
+        """Return a dictionary with campaign data formatted for AI personalization"""
+        return {
+            'name': self.name,
+            'short_name': self.short_name,
+            'product_name': self.product.name,
+            'product_description': self.product.description,
+            'start_date': self.start_date.isoformat(),
+            'end_date': self.end_date.isoformat() if self.end_date else None
+        }
 
 
 
@@ -150,6 +157,20 @@ class Lead(models.Model):
 
     def __str__(self):
         return f"{self.full_name}"
+
+    def to_dict_for_ai(self):
+        """Return a dictionary with lead data formatted for AI personalization"""
+        return {
+            'full_name': self.full_name,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'position': self.position,
+            'company_name': self.company_name,
+            'industry': self.industry,
+            'source': self.get_source_display(),
+            'lead_type': self.get_lead_type_display(),
+            'created_at': self.created_at.isoformat()
+        }
 
 
 
@@ -471,6 +492,29 @@ class MessageAssignment(models.Model):
             return
         
         super().save(*args, **kwargs)
+
+    def get_ai_personalization_data(self):
+        """
+        Gather all relevant data needed for AI personalization.
+        Returns a dictionary with lead, campaign, and message data.
+        """
+        data = {
+            'lead': {},
+            'campaign': {},
+            'message': {
+                'template': self.personlized_msg_tmp
+            }
+        }
+        
+        # Get lead data
+        if self.campaign_lead and self.campaign_lead.lead:
+            data['lead'] = self.campaign_lead.lead.to_dict_for_ai()
+        
+        # Get campaign data
+        if self.campaign:
+            data['campaign'] = self.campaign.to_dict_for_ai()
+        
+        return data
 
 
 

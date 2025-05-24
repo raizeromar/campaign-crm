@@ -666,7 +666,7 @@ class MessageAssignmentAdminForm(forms.ModelForm):
 @admin.register(MessageAssignment)
 class MessageAssignmentAdmin(admin.ModelAdmin):
     form = MessageAssignmentAdminForm
-    list_display = ('campaign_lead', 'message', 'link_info', 'scheduled_at', 'sent_at', 'responded')
+    list_display = ('id', 'campaign_lead', 'message', 'link_info', 'scheduled_at', 'sent_at', 'responded')
     list_filter = ('campaign', 'responded', 'scheduled_at', 'sent_at')
     search_fields = ('campaign_lead__lead__full_name', 'message__subject')
     
