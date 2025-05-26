@@ -1,4 +1,9 @@
 from pathlib import Path
+from environ import Env
+
+# Initialize environment variables
+env = Env()
+Env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -8,12 +13,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-jcxge@8cwms-4-$&qia^6p+^8-qwrsw7vey#0e6e326apg3mvo'
+SECRET_KEY = env('SECRET_KEY', default='django-insecure-jcxge@8cwms-4-$&qia^6p+^8-qwrsw7vey#0e6e326apg3mvo')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.bool('DEBUG', default=True)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
 
 
 # Application definition
@@ -145,18 +150,26 @@ LOGGING = {
 }
 
 # Site URL for generating absolute URLs
-SITE_URL = 'http://localhost:8000'  # Development URL
+SITE_URL = env('SITE_URL')
 
-# In production, you would set this to your actual domain
-# SITE_URL = 'https://example.com'  # Production URL
 
 # Celery settings
-CELERY_RESULT_BACKEND = 'django-db'  # Store results in Django database
-CELERY_BROKER_URL = 'redis://default:WEO1YGRPE6sWhveLXxHTU6sJYbLaI0Nz@redis-13243.c300.eu-central-1-1.ec2.redns.redis-cloud.com:13243'
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'UTC'
-CELERY_TASK_TRACK_STARTED = True
-CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 minutes
-CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND')
+CELERY_BROKER_URL = env('CELERY_BROKER_URL')
+CELERY_ACCEPT_CONTENT = env.list('CELERY_ACCEPT_CONTENT')
+CELERY_TASK_SERIALIZER = env('CELERY_TASK_SERIALIZER')
+CELERY_RESULT_SERIALIZER = env('CELERY_RESULT_SERIALIZER')
+CELERY_TIMEZONE = env('CELERY_TIMEZONE')
+CELERY_TASK_TRACK_STARTED = env.bool('CELERY_TASK_TRACK_STARTED')
+CELERY_TASK_TIME_LIMIT = env.int('CELERY_TASK_TIME_LIMIT')
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = env.bool('CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP')
+
+# Email settings for Zoho Mail
+EMAIL_BACKEND = env('EMAIL_BACKEND')
+EMAIL_HOST = env('EMAIL_HOST')
+EMAIL_PORT = env.int('EMAIL_PORT')
+EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS')
+EMAIL_USE_SSL = env.bool('EMAIL_USE_SSL')
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL')

@@ -8,12 +8,15 @@ from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.urls import path
 from urllib.parse import unquote
+
+from campaign.email_sender import send_campaign_email
 from .models import (
     Product, Campaign, Lead, NewsletterSubscriber,
     CampaignLead, Message, Link, MessageAssignment, CampaignStats
 )
 import logging
 from django.conf import settings
+
 
 # Configure logger
 logger = logging.getLogger(__name__)
@@ -666,13 +669,13 @@ class MessageAssignmentAdminForm(forms.ModelForm):
 @admin.register(MessageAssignment)
 class MessageAssignmentAdmin(admin.ModelAdmin):
     form = MessageAssignmentAdminForm
-    list_display = ('id', 'campaign_lead', 'message', 'link_info', 'scheduled_at', 'sent_at', 'responded')
-    list_filter = ('campaign', 'responded', 'scheduled_at', 'sent_at')
+    list_display = ('id', 'campaign_lead', 'message', 'link_info', 'scheduled_at', 'sent_at', 'responded', 'sent')
+    list_filter = ('campaign', 'responded', 'scheduled_at', 'sent_at', 'sent')
     search_fields = ('campaign_lead__lead__full_name', 'message__subject')
     
     fieldsets = (
         ('Message Assignment', {
-            'fields': ('campaign', 'campaign_lead', 'message', 'create_for_all_leads', 'personlized_msg_tmp', 'personlized_msg_to_send', 'scheduled_at', 'responded', 'responded_content')
+            'fields': ('campaign', 'campaign_lead', 'message', 'create_for_all_leads', 'personlized_msg_tmp', 'personlized_msg_to_send', 'scheduled_at', 'sent', 'sent_at', 'responded', 'responded_content')
         }),
         ('Tracking Link Parameters', {
             'classes': ('collapse',),
@@ -681,7 +684,7 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
         }),
     )
     
-    actions = ['personalize_selected_messages']
+    actions = ['personalize_selected_messages', 'send_selected_messages']
     
     def get_urls(self):
         urls = super().get_urls()
@@ -689,6 +692,7 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
             path('get-campaign-leads/', self.admin_site.admin_view(self.get_campaign_leads), name='get_campaign_leads'),
             path('get-campaign-messages/', self.admin_site.admin_view(self.get_campaign_messages), name='get_campaign_messages'),
             path('<int:message_id>/personalize/', self.admin_site.admin_view(self.personalize_message), name='personalize_message'),
+            path('<int:message_id>/send/', self.admin_site.admin_view(self.send_message), name='send_message'),
         ]
         return custom_urls + urls
     
@@ -1275,6 +1279,79 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
             self.message_user(request, f"Error scheduling personalization tasks: {str(e)}", level=messages.ERROR)
     
     personalize_selected_messages.short_description = "Personalize selected messages with AI"
+    
+    def send_message(self, request, message_id):
+        """View to send an email for a single message"""
+        try:
+            # Check if the message assignment exists
+            message_assignment = self.model.objects.get(id=message_id)
+            
+            # Check if it has personalized content and hasn't been sent
+            if not message_assignment.personlized_msg_to_send:
+                self.message_user(request, f"Message assignment ID {message_id} has no personalized content", level=messages.ERROR)
+                return HttpResponseRedirect(f"../../../campaign/messageassignment/{message_id}/change/")
+                
+            if message_assignment.sent:
+                self.message_user(request, f"Message assignment ID {message_id} has already been sent", level=messages.WARNING)
+                return HttpResponseRedirect(f"../../../campaign/messageassignment/{message_id}/change/")
+            
+            # Send the email
+            success = send_campaign_email(message_assignment)
+            
+            if success:
+                self.message_user(
+                    request, 
+                    f"Successfully sent email to {message_assignment.campaign_lead.lead.email}",
+                    level=messages.SUCCESS
+                )
+            else:
+                self.message_user(
+                    request, 
+                    f"Failed to send email to {message_assignment.campaign_lead.lead.email}",
+                    level=messages.ERROR
+                )
+                    
+        except self.model.DoesNotExist:
+            self.message_user(request, f"Message assignment with ID {message_id} does not exist", level=messages.ERROR)
+        except Exception as e:
+            self.message_user(request, f"Error sending email: {str(e)}", level=messages.ERROR)
+            
+        # Redirect back to the change page
+        return HttpResponseRedirect(f"../../../campaign/messageassignment/{message_id}/change/")
+    
+    def send_selected_messages(self, request, queryset):
+        """Action to send emails for multiple messages"""
+        try:
+            # Filter to only include personalized messages that haven't been sent
+            queryset = queryset.filter(
+                personlized_msg_to_send__isnull=False,
+                personlized_msg_to_send__gt='',
+                sent=False
+            )
+            
+            if not queryset.exists():
+                self.message_user(
+                    request, 
+                    "No messages selected that are personalized and not yet sent",
+                    level=messages.WARNING
+                )
+                return
+                
+            # Send emails for each message assignment
+            success_count = 0
+            for message_assignment in queryset:
+                if send_campaign_email(message_assignment):
+                    success_count += 1
+            
+            self.message_user(
+                request, 
+                f"Successfully sent {success_count}/{queryset.count()} emails",
+                level=messages.SUCCESS
+            )
+        except Exception as e:
+            self.message_user(request, f"Error sending emails: {str(e)}", level=messages.ERROR)
+    
+    send_selected_messages.short_description = "Send emails for selected messages"
     
     # Add a button to the change form
     def change_view(self, request, object_id, form_url='', extra_context=None):
