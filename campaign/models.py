@@ -536,6 +536,30 @@ class MessageAssignment(models.Model):
         
         return data
 
+    def personalize_with_ai(self):
+        """
+        Use AI to personalize this message and save the result.
+        
+        Returns:
+            bool: True if successful, False otherwise
+        """
+        try:
+            from campaign.ai_service import personalize_message
+            
+            # Get personalized text
+            personalized_text = personalize_message(self)
+            
+            # Save it to the database
+            self.personlized_msg_to_send = personalized_text
+            self.save(update_fields=['personlized_msg_to_send'])
+            
+            return True
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Error personalizing message: {str(e)}")
+            return False
+
 
 
 class CampaignStats(models.Model):

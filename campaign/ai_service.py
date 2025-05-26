@@ -17,6 +17,10 @@ def personalize_message(message_assignment):
         str: Personalized message text
     """
     try:
+        # Check if we already have a personalized message
+        if message_assignment.personlized_msg_to_send:
+            return message_assignment.personlized_msg_to_send
+            
         # Get data needed for personalization
         data = message_assignment.get_ai_personalization_data()
         
@@ -160,3 +164,31 @@ def construct_prompt(data):
     """
     
     return prompt
+
+
+def personalize_and_save_message(message_assignment_id):
+    """
+    Personalize a message using AI and save it to the database.
+    
+    Args:
+        message_assignment_id: ID of the MessageAssignment to personalize
+        
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    try:
+        # Get the message assignment
+        from campaign.models import MessageAssignment
+        message_assignment = MessageAssignment.objects.get(id=message_assignment_id)
+        
+        # Get personalized text from AI
+        personalized_text = personalize_message(message_assignment)
+        
+        # Save the personalized text to the database
+        message_assignment.personlized_msg_to_send = personalized_text
+        message_assignment.save(update_fields=['personlized_msg_to_send'])
+        
+        return True
+        
+    except Exception as e:
+        return False

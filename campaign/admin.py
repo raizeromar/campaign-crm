@@ -681,11 +681,14 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
         }),
     )
     
+    actions = ['personalize_selected_messages']
+    
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [
             path('get-campaign-leads/', self.admin_site.admin_view(self.get_campaign_leads), name='get_campaign_leads'),
             path('get-campaign-messages/', self.admin_site.admin_view(self.get_campaign_messages), name='get_campaign_messages'),
+            path('<int:message_id>/personalize/', self.admin_site.admin_view(self.personalize_message), name='personalize_message'),
         ]
         return custom_urls + urls
     
@@ -1228,3 +1231,45 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
         
         # Otherwise, proceed with the default behavior
         return super().response_add(request, obj, post_url_continue)
+    
+    def personalize_message(self, request, message_id):
+        """View to personalize a single message"""
+        try:
+            message_assignment = self.model.objects.get(id=message_id)
+            success = message_assignment.personalize_with_ai()
+            
+            if success:
+                self.message_user(request, f"Successfully personalized message for {message_assignment.campaign_lead}", level=messages.SUCCESS)
+            else:
+                self.message_user(request, f"Failed to personalize message for {message_assignment.campaign_lead}", level=messages.ERROR)
+                
+        except self.model.DoesNotExist:
+            self.message_user(request, f"Message assignment with ID {message_id} does not exist", level=messages.ERROR)
+        except Exception as e:
+            self.message_user(request, f"Error personalizing message: {str(e)}", level=messages.ERROR)
+            
+        # Redirect back to the change page
+        return HttpResponseRedirect(f"../../../campaign/messageassignment/{message_id}/change/")
+    
+    def personalize_selected_messages(self, request, queryset):
+        """Action to personalize multiple messages"""
+        success_count = 0
+        for message_assignment in queryset:
+            try:
+                if message_assignment.personalize_with_ai():
+                    success_count += 1
+            except Exception as e:
+                self.message_user(request, f"Error personalizing message ID {message_assignment.id}: {str(e)}", level=messages.ERROR)
+                
+        if success_count > 0:
+            self.message_user(request, f"Successfully personalized {success_count} messages", level=messages.SUCCESS)
+        else:
+            self.message_user(request, "No messages were personalized", level=messages.WARNING)
+    
+    personalize_selected_messages.short_description = "Personalize selected messages with AI"
+    
+    # Add a button to the change form
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['show_personalize_button'] = True
+        return super().change_view(request, object_id, form_url, extra_context)
