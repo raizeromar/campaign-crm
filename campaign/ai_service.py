@@ -55,11 +55,29 @@ def call_ai_service(data):
         
         # System instruction for Gemini
         system_instruction = """
-        You are an expert email copywriter specializing in personalized outreach.
-        Your task is to rewrite email templates to make them more personalized, engaging, and effective.
-        Focus on creating natural-sounding messages that connect with the recipient based on their industry, position, and company.
-        Always maintain a professional tone and ensure the message is clear and concise.
-        Do not include any placeholders in your response - replace all variables with actual content.
+        You are an expert cold email copywriter specializing in personalization only.
+
+        Your role is NOT to rewrite or improve the tone of the message — only to personalize an existing template using lead and campaign information. The template has already been written with the sender’s tone, and it must be preserved exactly.
+
+        The sender’s tone is:
+        - **Casual-professional**
+        - **Direct and concise**
+        - **Slightly informal**
+        - **Conversational and friendly, but not fluffy**
+        - Written in a way that sounds like a real person, not a corporate marketer
+
+        Do NOT:
+        - Add or remove sentences
+        - Rephrase or rewrite sections for engagement
+        - Introduce adjectives or expressions not already present
+
+        ONLY:
+        - Insert relevant personalization based on the lead's name, company, position, and industry
+        - Make the email feel natural by fitting in the personal details
+        - Replace all placeholders
+
+        Never add placeholders or suggestions. All variables must be replaced with actual content.
+
         """
         
         # Call Gemini API with system instruction
@@ -110,7 +128,16 @@ def construct_prompt(data):
     
     
     prompt = f"""
-    Please personalize the following email template for a lead with these details:
+    Please personalize the following email template using the lead and campaign details provided.
+
+    IMPORTANT INSTRUCTIONS:
+    - DO NOT change the tone, sentence structure, or wording style of the email template.
+    - ONLY add light personalization where appropriate based on the lead's name, company, role, or industry.
+    - The email was written by me. My tone is casual-professional, concise, slightly informal, and direct — do not modify it.
+    - Avoid "fluff", buzzwords, or additional phrasing not found in the original.
+    - DO NOT "rewrite" or "make it more engaging" — just personalize it in my style.
+    - Replace all placeholders with the actual values from the lead and campaign data.
+    - Leave everything else as-is, you are allowed to correct things if neccessary, like typing error, captalizing...
     
     LEAD INFORMATION:
     - Full Name: {lead.get('full_name', 'Unknown')}
@@ -130,11 +157,6 @@ def construct_prompt(data):
     
     EMAIL TEMPLATE:
     {template}
-    
-    Please rewrite this email to make it more personalized and engaging for this specific lead.
-    Keep the same general structure but add personalized details and make it sound natural.
-    Do not add any placeholders - replace all variables with actual content.
-    If the industry is not specified, make reasonable assumptions based on the company name and position.
     """
     
     return prompt
