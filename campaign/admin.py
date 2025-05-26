@@ -1233,38 +1233,46 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
         return super().response_add(request, obj, post_url_continue)
     
     def personalize_message(self, request, message_id):
-        """View to personalize a single message"""
+        """View to personalize a single message using Celery"""
         try:
+            # Check if the message assignment exists
             message_assignment = self.model.objects.get(id=message_id)
-            success = message_assignment.personalize_with_ai()
             
-            if success:
-                self.message_user(request, f"Successfully personalized message for {message_assignment.campaign_lead}", level=messages.SUCCESS)
-            else:
-                self.message_user(request, f"Failed to personalize message for {message_assignment.campaign_lead}", level=messages.ERROR)
-                
+            # Schedule the Celery task
+            from campaign.tasks import personalize_message_task
+            task = personalize_message_task.delay(message_id)
+            
+            self.message_user(
+                request, 
+                f"Scheduled personalization task (ID: {task.id}) for {message_assignment.campaign_lead}",
+                level=messages.SUCCESS
+            )
+                    
         except self.model.DoesNotExist:
             self.message_user(request, f"Message assignment with ID {message_id} does not exist", level=messages.ERROR)
         except Exception as e:
-            self.message_user(request, f"Error personalizing message: {str(e)}", level=messages.ERROR)
+            self.message_user(request, f"Error scheduling personalization task: {str(e)}", level=messages.ERROR)
             
         # Redirect back to the change page
         return HttpResponseRedirect(f"../../../campaign/messageassignment/{message_id}/change/")
-    
+
     def personalize_selected_messages(self, request, queryset):
-        """Action to personalize multiple messages"""
-        success_count = 0
-        for message_assignment in queryset:
-            try:
-                if message_assignment.personalize_with_ai():
-                    success_count += 1
-            except Exception as e:
-                self.message_user(request, f"Error personalizing message ID {message_assignment.id}: {str(e)}", level=messages.ERROR)
-                
-        if success_count > 0:
-            self.message_user(request, f"Successfully personalized {success_count} messages", level=messages.SUCCESS)
-        else:
-            self.message_user(request, "No messages were personalized", level=messages.WARNING)
+        """Action to personalize multiple messages using Celery"""
+        try:
+            # Schedule a task for each message assignment
+            from campaign.tasks import personalize_message_task
+            count = 0
+            for message_assignment in queryset:
+                personalize_message_task.delay(message_assignment.id)
+                count += 1
+            
+            self.message_user(
+                request, 
+                f"Scheduled personalization tasks for {count} messages",
+                level=messages.SUCCESS
+            )
+        except Exception as e:
+            self.message_user(request, f"Error scheduling personalization tasks: {str(e)}", level=messages.ERROR)
     
     personalize_selected_messages.short_description = "Personalize selected messages with AI"
     
