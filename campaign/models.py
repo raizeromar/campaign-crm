@@ -450,6 +450,8 @@ class MessageAssignment(models.Model):
     personlized_msg_to_send = models.TextField(blank=True)
     
     scheduled_at = models.DateTimeField(null=True, blank=True)
+
+    sent = models.BooleanField(default=False)
     sent_at = models.DateTimeField(null=True, blank=True)
 
     responded = models.BooleanField(default=False)
