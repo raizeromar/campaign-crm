@@ -237,6 +237,7 @@ class Message(models.Model):
     cta = models.CharField(max_length=255, blank=True)
     ps = models.TextField(blank=True)
     pps = models.TextField(blank=True)
+    end = models.CharField(max_length=255)
 
     full_content = models.TextField(blank=True)
 
@@ -252,6 +253,8 @@ class Message(models.Model):
             parts.append(self.content)
         if self.cta:
             parts.append(f"{self.cta}")
+        if self.end:
+            parts.append(f"{self.end}")    
         if self.ps:
             parts.append(f"{self.ps}")
         if self.pps:
