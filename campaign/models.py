@@ -4,6 +4,7 @@ import uuid
 from urllib.parse import urlparse, urlunparse, parse_qs, urlencode
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.conf import settings
 
 class Product(models.Model):
     name = models.CharField(max_length=255)
@@ -237,10 +238,28 @@ class Message(models.Model):
     ps = models.TextField(blank=True)
     pps = models.TextField(blank=True)
 
+    full_content = models.TextField(blank=True)
+
     def __str__(self):
         return f"{self.subject}"
 
-
+    def save(self, *args, **kwargs):
+        # Combine all message components into full_content
+        parts = []
+        if self.intro:
+            parts.append(self.intro)
+        if self.content:
+            parts.append(self.content)
+        if self.cta:
+            parts.append(f"{self.cta}")
+        if self.ps:
+            parts.append(f"{self.ps}")
+        if self.pps:
+            parts.append(f"{self.pps}")
+            
+        self.full_content = "\n\n".join(parts)
+        
+        super().save(*args, **kwargs)        
 
 
 
@@ -436,24 +455,22 @@ class MessageAssignment(models.Model):
     def get_tracking_url(self):
         """Get the tracking URL for this message assignment"""
         if self.url:
-            return self.url.get_redirect_url()
+            redirect_url= self.url.get_redirect_url()
+            full_url = f"{settings.SITE_URL}{redirect_url}" if hasattr(settings, 'SITE_URL') else redirect_url
+            return full_url
         return ""
     
     def get_personalized_content_tmp(self):
         """Get the personalized message content with tracking URL"""
-        content = self.personlized_msg_tmp or self.message.content
-        
-        # Replace placeholders with actual values
-        if self.campaign_lead and self.campaign_lead.lead:
-            lead = self.campaign_lead.lead
-            content = content.replace('{first_name}', lead.first_name)
-            content = content.replace('{last_name}', lead.last_name)
-            content = content.replace('{company}', lead.company_name)
+        content = self.personlized_msg_tmp or self.message.full_content
         
         # Replace CTA placeholder with tracking URL if available
         if self.url:
             tracking_url = self.get_tracking_url()
-            content = content.replace('{cta_url}', tracking_url)
+            content = content.replace('{ps_url}', tracking_url)
+            if self.message.pps:
+                content = content.replace('{pps_url}', tracking_url)
+            
         
         return content
 
@@ -466,10 +483,7 @@ class MessageAssignment(models.Model):
         # Set campaign from campaign_lead if not explicitly set
         if self.campaign_lead and not self.campaign:
             self.campaign = self.campaign_lead.campaign
-
-        if not self.personlized_msg_tmp:
-            self.personlized_msg_tmp = self.get_personalized_content_tmp() 
-            
+          
         # First save to get an ID if this is a new assignment
         if not self.id:
             super().save(*args, **kwargs)
@@ -490,6 +504,9 @@ class MessageAssignment(models.Model):
             kwargs['force_insert'] = False
             super().save(*args, **kwargs)
             return
+        
+        if not self.personlized_msg_tmp:
+            self.personlized_msg_tmp = self.get_personalized_content_tmp() 
         
         super().save(*args, **kwargs)
 

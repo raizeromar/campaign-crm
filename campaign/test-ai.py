@@ -1,38 +1,11 @@
 
-import json
-import logging
-import os
+
+
+
 from google import genai
 from google.genai import types
 
-    
-def personalize_message(message_assignment):
-    """
-    Use AI to personalize a message based on lead and campaign data.
-    
-    Args:
-        message_assignment: MessageAssignment object containing the template and related data
-        
-    Returns:
-        str: Personalized message text
-    """
-    try:
-        # Get data needed for personalization
-        data = message_assignment.get_ai_personalization_data()
-        
-        # Optional: Write to file for debugging/inspection only
-        # with open('campaign/json.json', 'w') as f:
-        #     f.write(json.dumps(data, indent=2))
-        #     print("Successfully wrote data to campaign/json.json")
-        
-        # Call AI service with the data dictionary
-        personalized_text = call_ai_service(data)
-        
-        return personalized_text
-        
-    except Exception as e:
-        # Return the template as fallback
-        return message_assignment.personlized_msg_tmp
+
 
 
 
@@ -50,8 +23,7 @@ def call_ai_service(data):
         client = genai.Client(api_key='AIzaSyBDrSRJhI-gINvIO9RgCmDEQndpuDLaipk')
 
         # Construct the prompt for Gemini
-        prompt = construct_prompt(data)
-        prompt = str(prompt)
+        prompt = data
         
         # System instruction for Gemini
         system_instruction = """
@@ -92,49 +64,32 @@ def call_ai_service(data):
 
 
 
-
-
-def construct_prompt(data):
-    """
-    Construct a prompt for the AI based on the data.
-    
-    Args:
-        data: Dictionary containing lead, campaign, and message template data
-        
-    Returns:
-        str: Prompt for the AI
-    """
-    lead = data['lead']
-    campaign = data['campaign']
-    template = data['message'].get('template', '')
-    
-    
-    prompt = f"""
-    Please personalize the following email template for a lead with these details:
+if __name__ == "__main__":
+    data = """
+        Please personalize the following email template for a lead with these details:
     
     LEAD INFORMATION:
-    - Full Name: {lead.get('full_name', 'Unknown')}
-    - First Name: {lead.get('first_name', 'Unknown')}
-    - Last Name: {lead.get('last_name', 'Unknown')}
-    - Position: {lead.get('position', 'Unknown')}
-    - Company: {lead.get('company_name', 'Unknown')}
-    - Industry: {lead.get('industry', 'Unknown') or 'Not specified'}
-    - Lead type: {lead.get('lead_type', 'Unknown')}
-    - Source: {lead.get('source', 'Unknown')}
+    - Full Name: Fdud Ramo
+    - First Name: Fdud
+    - Last Name: Ramo
+    - Position: CEO
+    - Company: Woomark
+    - Industry: Not specified
+    - Lead type: Warm
+    - Source: LinkedIn Scrape
     
     CAMPAIGN INFORMATION:
-    - Campaign: {campaign.get('name', 'Unknown')}
-    - Campaign ID: {campaign.get('short_name', 'Unknown')}
-    - Product: {campaign.get('product_name', 'Unknown')}
-    - Product description: {campaign.get('product_description', 'Unknown') or 'Not provided'}
+    - Campaign: first campain
+    - Campaign ID: c1-fc
+    - Product: Cold Outreach Agent
+    - Product description: Not provided
     
     EMAIL TEMPLATE:
-    {template}
+        Hello {first_name},\n\nWe are excited to welcome you to {company}. This is the main content of our welcome message.
     
     Please rewrite this email to make it more personalized and engaging for this specific lead.
     Keep the same general structure but add personalized details and make it sound natural.
     Do not add any placeholders - replace all variables with actual content.
     If the industry is not specified, make reasonable assumptions based on the company name and position.
-    """
-    
-    return prompt
+"""
+    print(call_ai_service(data))
