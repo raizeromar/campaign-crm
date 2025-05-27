@@ -111,3 +111,120 @@ def personalize_all_messages_task(force=False):
             'status': 'error',
             'message': str(e)
         }
+
+@shared_task
+def send_email_task(message_assignment_id):
+    """
+    Celery task to send an email for a message assignment.
+    
+    Args:
+        message_assignment_id: ID of the MessageAssignment to send
+        
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    try:
+        # Get the message assignment
+        message_assignment = MessageAssignment.objects.get(id=message_assignment_id)
+        
+        # Check if it has personalized content and hasn't been sent
+        if not message_assignment.personlized_msg_to_send:
+            logger.error(f"Message assignment ID {message_assignment_id} has no personalized content")
+            return False
+                
+        if message_assignment.sent:
+            logger.warning(f"Message assignment ID {message_assignment_id} has already been sent")
+            return "already sent"
+        
+        # Send the email using the existing function
+        from campaign.email_sender import send_campaign_email
+        success = send_campaign_email(message_assignment)
+        
+        return success
+        
+    except MessageAssignment.DoesNotExist:
+        logger.error(f"MessageAssignment with ID {message_assignment_id} does not exist")
+        return False
+    except Exception as e:
+        logger.error(f"Error sending email: {str(e)}")
+        return False
+
+@shared_task
+def send_campaign_emails_task(campaign_id, only_personalized=True):
+    """
+    Celery task to send emails for all message assignments in a campaign.
+    
+    Args:
+        campaign_id: ID of the Campaign
+        only_personalized: Only send emails that have personalized content
+        
+    Returns:
+        dict: Results of the operation
+    """
+    try:
+        # Get all message assignments for this campaign that haven't been sent
+        query = MessageAssignment.objects.filter(
+            campaign_id=campaign_id,
+            sent=False
+        )
+        
+        if only_personalized:
+            query = query.filter(personlized_msg_to_send__gt='')
+            
+        count = query.count()
+        logger.info(f"Sending {count} emails for campaign ID {campaign_id}")
+        
+        # Create a task for each message assignment
+        for message_assignment in query:
+            send_email_task.delay(message_assignment.id)
+            
+        return {
+            'status': 'success',
+            'message': f'Scheduled sending for {count} emails',
+            'campaign_id': campaign_id
+        }
+        
+    except Exception as e:
+        logger.error(f"Error scheduling email sending tasks: {str(e)}")
+        return {
+            'status': 'error',
+            'message': str(e),
+            'campaign_id': campaign_id
+        }
+
+@shared_task
+def send_all_emails_task(only_personalized=True):
+    """
+    Celery task to send all pending emails in the system.
+    
+    Args:
+        only_personalized: Only send emails that have personalized content
+        
+    Returns:
+        dict: Results of the operation
+    """
+    try:
+        # Get all message assignments that haven't been sent
+        query = MessageAssignment.objects.filter(sent=False)
+        
+        if only_personalized:
+            query = query.filter(personlized_msg_to_send__gt='')
+            
+        count = query.count()
+        logger.info(f"Sending {count} emails")
+        
+        # Create a task for each message assignment
+        for message_assignment in query:
+            send_email_task.delay(message_assignment.id)
+            
+        return {
+            'status': 'success',
+            'message': f'Scheduled sending for {count} emails'
+        }
+        
+    except Exception as e:
+        logger.error(f"Error scheduling email sending tasks: {str(e)}")
+        return {
+            'status': 'error',
+            'message': str(e)
+        }

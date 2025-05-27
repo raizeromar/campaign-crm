@@ -1283,7 +1283,7 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
     personalize_selected_messages.short_description = "Personalize selected messages with AI"
     
     def send_message(self, request, message_id):
-        """View to send an email for a single message"""
+        """View to send an email for a single message using Celery"""
         try:
             # Check if the message assignment exists
             message_assignment = self.model.objects.get(id=message_id)
@@ -1297,32 +1297,26 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
                 self.message_user(request, f"Message assignment ID {message_id} has already been sent", level=messages.WARNING)
                 return HttpResponseRedirect(f"../../../campaign/messageassignment/{message_id}/change/")
             
-            # Send the email
-            success = send_campaign_email(message_assignment)
+            # Schedule the Celery task
+            from campaign.tasks import send_email_task
+            task = send_email_task.delay(message_id)
             
-            if success:
-                self.message_user(
-                    request, 
-                    f"Successfully sent email to {message_assignment.campaign_lead.lead.email}",
-                    level=messages.SUCCESS
-                )
-            else:
-                self.message_user(
-                    request, 
-                    f"Failed to send email to {message_assignment.campaign_lead.lead.email}",
-                    level=messages.ERROR
-                )
-                    
+            self.message_user(
+                request, 
+                f"Scheduled email sending task (ID: {task.id}) for {message_assignment.campaign_lead.lead.email}",
+                level=messages.SUCCESS
+            )
+                
         except self.model.DoesNotExist:
             self.message_user(request, f"Message assignment with ID {message_id} does not exist", level=messages.ERROR)
         except Exception as e:
-            self.message_user(request, f"Error sending email: {str(e)}", level=messages.ERROR)
-            
+            self.message_user(request, f"Error scheduling email sending task: {str(e)}", level=messages.ERROR)
+        
         # Redirect back to the change page
         return HttpResponseRedirect(f"../../../campaign/messageassignment/{message_id}/change/")
-    
+
     def send_selected_messages(self, request, queryset):
-        """Action to send emails for multiple messages"""
+        """Action to send emails for multiple messages using Celery"""
         try:
             # Filter to only include personalized messages that haven't been sent
             queryset = queryset.filter(
@@ -1339,19 +1333,20 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
                 )
                 return
                 
-            # Send emails for each message assignment
-            success_count = 0
+            # Schedule a task for each message assignment
+            from campaign.tasks import send_email_task
+            count = 0
             for message_assignment in queryset:
-                if send_campaign_email(message_assignment):
-                    success_count += 1
+                send_email_task.delay(message_assignment.id)
+                count += 1
             
             self.message_user(
                 request, 
-                f"Successfully sent {success_count}/{queryset.count()} emails",
+                f"Scheduled email sending tasks for {count} messages",
                 level=messages.SUCCESS
             )
         except Exception as e:
-            self.message_user(request, f"Error sending emails: {str(e)}", level=messages.ERROR)
+            self.message_user(request, f"Error scheduling email sending tasks: {str(e)}", level=messages.ERROR)
     
     send_selected_messages.short_description = "Send emails for selected messages"
     
