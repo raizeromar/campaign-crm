@@ -473,10 +473,27 @@ class LinkAdmin(admin.ModelAdmin):
         if not campaign_id:
             return JsonResponse({'error': 'No campaign ID provided'}, status=400)
         
+        # Get campaign leads
         campaign_leads = CampaignLead.objects.filter(campaign_id=campaign_id)
         leads_data = [{'id': cl.id, 'text': str(cl)} for cl in campaign_leads]
         
         return JsonResponse({'campaign_leads': leads_data})
+    
+    def get_campaign_messages(self, request):
+        """AJAX view to get messages for a campaign's product"""
+        campaign_id = request.GET.get('campaign_id')
+        if not campaign_id:
+            return JsonResponse({'error': 'No campaign ID provided'}, status=400)
+        
+        try:
+            campaign = Campaign.objects.get(id=campaign_id)
+            product = campaign.product
+            messages = Message.objects.filter(product=product)
+            messages_data = [{'id': m.id, 'text': str(m)} for m in messages]
+            
+            return JsonResponse({'messages': messages_data})
+        except Campaign.DoesNotExist:
+            return JsonResponse({'error': 'Campaign not found'}, status=404)
     
     
         
@@ -673,6 +690,10 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
     list_filter = ('campaign', 'responded', 'scheduled_at', 'sent_at', 'sent')
     search_fields = ('campaign_lead__lead__full_name', 'message__subject')
     
+    # Add a template for the add form
+    add_form_template = 'admin/campaign/messageassignment/add_form.html'
+    change_form_template = 'admin/campaign/messageassignment/change_form.html'
+    
     fieldsets = (
         ('Message Assignment', {
             'fields': ('campaign', 'campaign_lead', 'message', 'create_for_all_leads', 'personlized_msg_tmp', 'personlized_msg_to_send', 'scheduled_at', 'sent', 'sent_at', 'responded', 'responded_content')
@@ -702,6 +723,7 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
         if not campaign_id:
             return JsonResponse({'error': 'No campaign ID provided'}, status=400)
         
+        # Get campaign leads
         campaign_leads = CampaignLead.objects.filter(campaign_id=campaign_id)
         leads_data = [{'id': cl.id, 'text': str(cl)} for cl in campaign_leads]
         
@@ -831,6 +853,7 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
                             },
                             error: function(xhr, status, error) {
                                 console.error("Error loading campaign leads:", error);
+                                console.error("Response:", xhr.responseText);
                                 // Enable the dropdown even on error
                                 $('#id_campaign_lead').prop('disabled', false);
                             }
@@ -874,6 +897,7 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
                             },
                             error: function(xhr, status, error) {
                                 console.error("Error loading messages:", error);
+                                console.error("Response:", xhr.responseText);
                                 // Enable the dropdown even on error
                                 $('#id_message').prop('disabled', false);
                             }
@@ -893,22 +917,6 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
                         updateCampaignLeads(initialCampaignId);
                         updateMessages(initialCampaignId);
                     }
-                    
-                    // Toggle visibility of campaign_lead field based on create_for_all_leads
-                    $('#id_create_for_all_leads').on('change', function() {
-                        if ($(this).is(':checked')) {
-                            // Hide campaign_lead field when creating for all leads
-                            $('#id_campaign_lead').closest('.form-row').hide();
-                        } else {
-                            // Show campaign_lead field when not creating for all leads
-                            $('#id_campaign_lead').closest('.form-row').show();
-                        }
-                    });
-                    
-                    // Initial toggle based on checkbox state
-                    if ($('#id_create_for_all_leads').is(':checked')) {
-                        $('#id_campaign_lead').closest('.form-row').hide();
-                    }
                 });
             })(django.jQuery);
         </script>
@@ -916,16 +924,15 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
         return super().add_view(request, form_url, extra_context)
         
     def change_view(self, request, object_id, form_url='', extra_context=None):
+        obj = self.get_object(request, object_id)
         extra_context = extra_context or {}
         
-        # Get the object being edited
-        obj = self.get_object(request, unquote(object_id))
-        
+        # Add JavaScript for dynamic dropdowns
         extra_context['campaign_lead_filter_js'] = """
         <script type="text/javascript">
             (function($) {
                 $(document).ready(function() {
-                    // Store initial values to restore after AJAX calls
+                    // Store initial values
                     var initialCampaignId = %s;
                     var initialCampaignLeadId = %s;
                     var initialMessageId = %s;
@@ -972,6 +979,7 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
                             },
                             error: function(xhr, status, error) {
                                 console.error("Error loading campaign leads:", error);
+                                console.error("Response:", xhr.responseText);
                                 // Enable the dropdown even on error
                                 $('#id_campaign_lead').prop('disabled', false);
                             }
@@ -1020,6 +1028,7 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
                             },
                             error: function(xhr, status, error) {
                                 console.error("Error loading messages:", error);
+                                console.error("Response:", xhr.responseText);
                                 // Enable the dropdown even on error
                                 $('#id_message').prop('disabled', false);
                             }

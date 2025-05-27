@@ -1,0 +1,83 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls %}
+
+{% block extrahead %}
+{{ block.super }}
+{{ campaign_lead_filter_js|safe }}
+{% endblock %}
+
+{% block content %}
+{{ block.super }}
+<script type="text/javascript">
+    // Additional script to ensure the campaign lead filter is working
+    (function($) {
+        $(document).ready(function() {
+            console.log("MessageAssignment add form template loaded");
+            
+            // Force refresh of campaign leads when campaign changes
+            $('#id_campaign').on('change', function() {
+                var campaignId = $(this).val();
+                console.log("Campaign changed to:", campaignId);
+                
+                if (!campaignId) {
+                    return;
+                }
+                
+                // Make direct AJAX request to get campaign leads
+                $.ajax({
+                    url: '/admin/campaign/messageassignment/get-campaign-leads/',
+                    data: {
+                        'campaign_id': campaignId
+                    },
+                    dataType: 'json',
+                    success: function(data) {
+                        console.log("Received campaign leads:", data);
+                        var $campaignLeadSelect = $('#id_campaign_lead');
+                        $campaignLeadSelect.empty();
+                        $campaignLeadSelect.append('<option value="">---------</option>');
+                        
+                        // Add options for each campaign lead
+                        $.each(data.campaign_leads, function(i, item) {
+                            $campaignLeadSelect.append(
+                                $('<option></option>').val(item.id).text(item.text)
+                            );
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error loading campaign leads:", error);
+                        console.error("Status:", status);
+                        console.error("Response:", xhr.responseText);
+                    }
+                });
+                
+                // Make direct AJAX request to get messages
+                $.ajax({
+                    url: '/admin/campaign/messageassignment/get-campaign-messages/',
+                    data: {
+                        'campaign_id': campaignId
+                    },
+                    dataType: 'json',
+                    success: function(data) {
+                        console.log("Received messages:", data);
+                        var $messageSelect = $('#id_message');
+                        $messageSelect.empty();
+                        $messageSelect.append('<option value="">---------</option>');
+                        
+                        // Add options for each message
+                        $.each(data.messages, function(i, item) {
+                            $messageSelect.append(
+                                $('<option></option>').val(item.id).text(item.text)
+                            );
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error loading messages:", error);
+                        console.error("Status:", status);
+                        console.error("Response:", xhr.responseText);
+                    }
+                });
+            });
+        });
+    })(django.jQuery);
+</script>
+{% endblock %}

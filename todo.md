@@ -5,3 +5,5 @@
 # combine the sending email in the celery tasks
 
 # handle reply messages
+celery -A dcrm worker -l info
+source ~/Desktop/virt/bin/activate
