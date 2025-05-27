@@ -1150,8 +1150,7 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
         
         # Normal save for a single message assignment
         if not change:
-            if not obj.personlized_msg_tmp:
-                obj.personlized_msg_tmp = obj.get_personalized_content_tmp()
+
 
             # Check if this campaign lead already has this message assigned
             if obj.campaign_lead and obj.message and MessageAssignment.objects.filter(
@@ -1164,22 +1163,18 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
                     level=messages.WARNING
                 )
                 # Set an attribute on the request to indicate we've handled this
-                # This will be checked in response_add to prevent the default success message
                 request._message_assignment_duplicate = True
                 return
-            
-            # For new assignments, save first to get an ID
-            super().save_model(request, obj, form, change)
             
             # Get UTM parameters from form
             utm_source = form.cleaned_data.get('utm_source')
             utm_medium = form.cleaned_data.get('utm_medium')
             utm_term = form.cleaned_data.get('utm_term')
-            utm_content = form.cleaned_data.get('utm_content') or f"email_{obj.id}"
+            utm_content = form.cleaned_data.get('utm_content')
             description = form.cleaned_data.get('description')
             
-            # Check if a link was already created by the model's save method
-            if not obj.url and obj.campaign_lead:
+            # Create link first if we have a campaign lead
+            if obj.campaign_lead:
                 # Create new link
                 link = Link(
                     campaign=obj.campaign_lead.campaign,
@@ -1188,14 +1183,26 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
                     utm_source=utm_source or "campaign",
                     utm_medium=utm_medium or "email",
                     utm_term=utm_term,
-                    utm_content=utm_content,
+                    utm_content=utm_content or f"email_new",  # Will be updated after save
                     description=description
                 )
                 link.save()
                 
                 # Attach link to message assignment
                 obj.url = link
-                obj.save()
+            
+            # Now save the object to get an ID
+            super().save_model(request, obj, form, change)
+            
+            # Update the link's utm_content with the message assignment ID if needed
+            if obj.url and not utm_content:
+                obj.url.utm_content = f"email_{obj.id}"
+                obj.url.save()
+            
+            # Generate personalized content with the link
+            if not obj.personlized_msg_tmp:
+                obj.personlized_msg_tmp = obj.get_personalized_content_tmp()
+                obj.save(update_fields=['personlized_msg_tmp'])
         else:
             # For existing assignments, just update
             super().save_model(request, obj, form, change)
