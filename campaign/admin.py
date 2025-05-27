@@ -1150,6 +1150,9 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
         
         # Normal save for a single message assignment
         if not change:
+            if not obj.personlized_msg_tmp:
+                obj.personlized_msg_tmp = obj.get_personalized_content_tmp()
+
             # Check if this campaign lead already has this message assigned
             if obj.campaign_lead and obj.message and MessageAssignment.objects.filter(
                 campaign_lead=obj.campaign_lead, 
