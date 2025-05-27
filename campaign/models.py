@@ -538,7 +538,7 @@ class MessageAssignment(models.Model):
         
         return data
 
-    def personalize_with_ai(self):
+    def personalize_with_ai(self, skip=True):
         """
         Use AI to personalize this message and save the result.
         
@@ -549,7 +549,7 @@ class MessageAssignment(models.Model):
             from campaign.ai_service import personalize_message
             
             # Get personalized text
-            personalized_text = personalize_message(self)
+            personalized_text = personalize_message(self, skip=skip)
             
             # Save it to the database
             self.personlized_msg_to_send = personalized_text

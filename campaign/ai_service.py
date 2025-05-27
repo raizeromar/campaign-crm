@@ -6,37 +6,50 @@ from google import genai
 from google.genai import types
 
     
-def personalize_message(message_assignment):
+def personalize_message(message_assignment, skip=True):
     """
     Use AI to personalize a message based on lead and campaign data.
     
     Args:
         message_assignment: MessageAssignment object containing the template and related data
+        skip: If True, skip AI and use simple replacement (default: True)
         
     Returns:
         str: Personalized message text
     """
-    try:
-        # Check if we already have a personalized message
-        if message_assignment.personlized_msg_to_send:
-            return message_assignment.personlized_msg_to_send
-            
-        # Get data needed for personalization
+
+    if skip:
         data = message_assignment.get_ai_personalization_data()
-        
-        # Optional: Write to file for debugging/inspection only
-        # with open('campaign/json.json', 'w') as f:
-        #     f.write(json.dumps(data, indent=2))
-        #     print("Successfully wrote data to campaign/json.json")
-        
-        # Call AI service with the data dictionary
-        personalized_text = call_ai_service(data)
-        
-        return personalized_text
-        
-    except Exception as e:
-        # Return the template as fallback
-        return message_assignment.personlized_msg_tmp
+        lead_name = data['lead'].get('first_name', 'there')
+        company = data['lead'].get('company_name', 'your company')
+        template = data['message'].get('template', '')
+        personalized = template.replace('{first_name}', lead_name).replace('{lead_company}', company)
+        message_assignment.personlized_msg_to_send = personalized
+        message_assignment.save(update_fields=['personlized_msg_to_send'])
+        return personalized
+    
+    else:
+        try:
+            # Check if we already have a personalized message
+            if message_assignment.personlized_msg_to_send:
+                return message_assignment.personlized_msg_to_send
+                
+            # Get data needed for personalization
+            data = message_assignment.get_ai_personalization_data()
+            
+            # Optional: Write to file for debugging/inspection only
+            # with open('campaign/json.json', 'w') as f:
+            #     f.write(json.dumps(data, indent=2))
+            #     print("Successfully wrote data to campaign/json.json")
+            
+            # Call AI service with the data dictionary
+            personalized_text = call_ai_service(data)
+            
+            return personalized_text
+            
+        except Exception as e:
+            # Return the template as fallback
+            return message_assignment.personlized_msg_tmp
 
 
 
@@ -52,7 +65,7 @@ def call_ai_service(data):
     """
     try:
         client = genai.Client(api_key='AIzaSyBDrSRJhI-gINvIO9RgCmDEQndpuDLaipk')
-
+        client= "uilllswndniednkdswnekcdnndcw"
         # Construct the prompt for Gemini
         prompt = construct_prompt(data)
         prompt = str(prompt)
@@ -148,7 +161,7 @@ def construct_prompt(data):
     - First Name: {lead.get('first_name', 'Unknown')}
     - Last Name: {lead.get('last_name', 'Unknown')}
     - Position: {lead.get('position', 'Unknown')}
-    - Company: {lead.get('company_name', 'Unknown')}
+    - Lead Company: {lead.get('company_name', 'Unknown')}
     - Industry: {lead.get('industry', 'Unknown') or 'Not specified'}
     - Lead type: {lead.get('lead_type', 'Unknown')}
     - Source: {lead.get('source', 'Unknown')}

@@ -5,12 +5,13 @@ from .models import MessageAssignment
 logger = logging.getLogger(__name__)
 
 @shared_task
-def personalize_message_task(message_assignment_id):
+def personalize_message_task(message_assignment_id, skip=True):
     """
     Celery task to personalize a message using AI and save it to the database.
     
     Args:
         message_assignment_id: ID of the MessageAssignment to personalize
+        skip: If True, skip AI and use simple replacement
         
     Returns:
         bool: True if successful, False otherwise
@@ -20,7 +21,7 @@ def personalize_message_task(message_assignment_id):
         message_assignment = MessageAssignment.objects.get(id=message_assignment_id)
         
         # Use the model's method to personalize
-        success = message_assignment.personalize_with_ai()
+        success = message_assignment.personalize_with_ai(skip=skip)
         
         if success:
             logger.info(f"Successfully personalized message for assignment ID {message_assignment_id}")
