@@ -477,24 +477,7 @@ class LinkAdmin(admin.ModelAdmin):
         campaign_leads = CampaignLead.objects.filter(campaign_id=campaign_id)
         leads_data = [{'id': cl.id, 'text': str(cl)} for cl in campaign_leads]
         
-        return JsonResponse({'campaign_leads': leads_data})
-    
-    def get_campaign_messages(self, request):
-        """AJAX view to get messages for a campaign's product"""
-        campaign_id = request.GET.get('campaign_id')
-        if not campaign_id:
-            return JsonResponse({'error': 'No campaign ID provided'}, status=400)
-        
-        try:
-            campaign = Campaign.objects.get(id=campaign_id)
-            product = campaign.product
-            messages = Message.objects.filter(product=product)
-            messages_data = [{'id': m.id, 'text': str(m)} for m in messages]
-            
-            return JsonResponse({'messages': messages_data})
-        except Campaign.DoesNotExist:
-            return JsonResponse({'error': 'Campaign not found'}, status=404)
-    
+        return JsonResponse({'campaign_leads': leads_data})    
     
         
     def changelist_view(self, request, extra_context=None):
