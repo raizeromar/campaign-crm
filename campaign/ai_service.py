@@ -25,7 +25,7 @@ def personalize_message(message_assignment, skip=True):
         template = data['message'].get('template', '')
         personalized = (template
                         .replace('{first_name}', lead_name)
-                        .replace('{lead_company}', company))
+                        .replace('{company_name}', company))
         message_assignment.save(update_fields=['personlized_msg_to_send'])
         return personalized
     
