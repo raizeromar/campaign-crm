@@ -1,5 +1,5 @@
 
-# the ai scrue up, so he sent "{leads_company} in the fucking email!"
+# AI placeholder issue: {leads_company} token not being replaced correctly in emails
 
 # make option where we can make assigment msgs for all the campaign leads and all the campaign messages at once (we can use a for loop maybe?)
 

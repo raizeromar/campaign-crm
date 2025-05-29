@@ -237,7 +237,7 @@ class Message(models.Model):
     cta = models.CharField(max_length=255, blank=True)
     ps = models.TextField(blank=True)
     pps = models.TextField(blank=True)
-    end = models.TextField(max_length=255)
+    end = models.TextField()
 
     full_content = models.TextField(blank=True)
 

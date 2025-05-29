@@ -23,8 +23,9 @@ def personalize_message(message_assignment, skip=True):
         lead_name = data['lead'].get('first_name', 'there')
         company = data['lead'].get('company_name', 'your company')
         template = data['message'].get('template', '')
-        personalized = template.replace('{first_name}', lead_name).replace('{lead_company}', company)
-        message_assignment.personlized_msg_to_send = personalized
+        personalized = (template
+                        .replace('{first_name}', lead_name)
+                        .replace('{lead_company}', company))
         message_assignment.save(update_fields=['personlized_msg_to_send'])
         return personalized
     
@@ -64,8 +65,7 @@ def call_ai_service(data):
         str: Personalized message from the AI
     """
     try:
-        client = genai.Client(api_key='AIzaSyBDrSRJhI-gINvIO9RgCmDEQndpuDLaipk')
-        client= "uilllswndniednkdswnekcdnndcw"
+        client = genai.Client(api_key=os.getenv('GEMENI_API_KEY'))
         # Construct the prompt for Gemini
         prompt = construct_prompt(data)
         prompt = str(prompt)
@@ -120,8 +120,9 @@ def call_ai_service(data):
         template = data['message'].get('template', '')
         
         # Simple placeholder personalization
-        personalized = template.replace('{first_name}', lead_name)
-        personalized = personalized.replace('{company}', company)
+        personalized = (template
+                        .replace('{first_name}', lead_name)
+                        .replace('{lead_company}', company))
         
         return personalized
 
