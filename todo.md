@@ -6,6 +6,13 @@
 # responded content foor the lead?
 
 
+# make the tracking url for email play list
+# change the name of the tracking url to be less susbichous 
+
+# make a feture to import leads via django import export 
+
+# make production and staging and dev envs
+
 # handle reply messages
 celery -A dcrm worker -l info
 source ~/Desktop/virt/bin/activate
