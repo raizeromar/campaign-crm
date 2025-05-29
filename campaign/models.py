@@ -237,7 +237,7 @@ class Message(models.Model):
     cta = models.CharField(max_length=255, blank=True)
     ps = models.TextField(blank=True)
     pps = models.TextField(blank=True)
-    end = models.TextField()
+    end = models.TextField(blank=True)
 
     full_content = models.TextField(blank=True)
 
@@ -252,13 +252,13 @@ class Message(models.Model):
         if self.content:
             parts.append(self.content)
         if self.cta:
-            parts.append(f"{self.cta}")
-        if self.end:
-            parts.append(f"{self.end}")    
+            parts.append(f"{self.cta}")  
         if self.ps:
             parts.append(f"{self.ps}")
         if self.pps:
             parts.append(f"{self.pps}")
+        if self.end:
+            parts.append(f"{self.end}")      
             
         self.full_content = "\n\n".join(parts)
         
