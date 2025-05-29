@@ -1,4 +1,4 @@
-from celery import shared_task, chain
+from celery import shared_task  # Removed chain import since we're making tasks independent
 from django.utils import timezone
 from django.conf import settings
 import logging
