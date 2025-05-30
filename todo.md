@@ -6,7 +6,7 @@
 # responded content foor the lead?
 
 
-# make the tracking url for email play list
+# make the tracking url for email newsletter list
 # change the name of the tracking url to be less susbichous 
 # add a hook for each one, like an email sending to my account using gmail, or notification in the app
 # or make the urls not showing upp in the email, rather in words like here, ex: [LinkedIn](https://www.linkedin.com/in/ahmad-higazi-4656b0366)
