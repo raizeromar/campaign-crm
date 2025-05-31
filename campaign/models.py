@@ -5,6 +5,7 @@ from urllib.parse import urlparse, urlunparse, parse_qs, urlencode
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.conf import settings
+import re
 
 class Product(models.Model):
     name = models.CharField(max_length=255)
@@ -471,43 +472,67 @@ class MessageAssignment(models.Model):
 
         return ""
     
+    
+
     def get_personalized_content_tmp(self):
-        """Get the personalized message content with tracking URL"""
+        """Get the personalized message content with tracking URLs"""
         content = self.personlized_msg_tmp or self.message.full_content
 
-        # Replace CTA placeholder with tracking URL if available
+        def _replace(tag, url):
+            pattern = rf'{{{tag}(?:\|([^}}]+))?}}'   # captures optional anchor text
+            def repl(m):
+                text = m.group(1) or "here"
+                return f'<a href="{url}">{text}</a>'
+            return re.sub(pattern, repl, content)
+        
         if self.url:
             product_tracking_url = self.get_tracking_url(url_type="product_url")
-            # Allow the user to define the anchor text, e.g., {ps_url|Click Here}
-            if '{ps_url' in content:
-                parts = content.split('{ps_url', 1)
-                before = parts[0]
-                after = parts[1]
-                
-                # Check if anchor text is provided
-                if '|' in after:
-                    anchor_text = after.split('}', 1)[0].split('|')[1]
-                    content = before + f'<a href="{product_tracking_url}">{anchor_text}</a>' + after.split('}', 1)[1]
-                else:
-                    content = before + f'<a href="{product_tracking_url}">here</a>' + after.split('}', 1)[1]
+            content = _replace("ps_url", product_tracking_url)
 
-        if self.newsletter_link:
-            newsletter_tracking_url = self.get_tracking_url(url_type="newsletter")
-            if self.message.pps:
-                if '{pps_url' in content:
-                    parts = content.split('{pps_url', 1)
-                    before = parts[0]
-                    after = parts[1]
-                    # Check if anchor text is provided
-                    if '|' in after:
-                        anchor_text = after.split('}', 1)[0].split('|')[1]
-                        content = before + f'<a href="{newsletter_tracking_url}">{anchor_text}</a>' + after.split('}', 1)[1]
-                    else:
-                        content = before + f'<a href="{newsletter_tracking_url}">here</a>' + after.split('}', 1)[1]            
+        if self.newsletter_link and self.message.pps:
+                newsletter_tracking_url = self.get_tracking_url(url_type="newsletter")
+                content = _replace("pps_url", newsletter_tracking_url)
+
+        return content
+
+
+    # def get_personalized_content_tmp(self):
+    #     """Get the personalized message content with tracking URL"""
+    #     content = self.personlized_msg_tmp or self.message.full_content
+
+    #     # Replace CTA placeholder with tracking URL if available
+    #     if self.url:
+    #         product_tracking_url = self.get_tracking_url(url_type="product_url")
+    #         # Allow the user to define the anchor text, e.g., {ps_url|Click Here}
+    #         if '{ps_url' in content:
+    #             parts = content.split('{ps_url', 1)
+    #             before = parts[0]
+    #             after = parts[1]
+                
+    #             # Check if anchor text is provided
+    #             if '|' in after:
+    #                 anchor_text = after.split('}', 1)[0].split('|')[1]
+    #                 content = before + f'<a href="{product_tracking_url}">{anchor_text}</a>' + after.split('}', 1)[1]
+    #             else:
+    #                 content = before + f'<a href="{product_tracking_url}">here</a>' + after.split('}', 1)[1]
+
+    #     if self.newsletter_link:
+    #         newsletter_tracking_url = self.get_tracking_url(url_type="newsletter")
+    #         if self.message.pps:
+    #             if '{pps_url' in content:
+    #                 parts = content.split('{pps_url', 1)
+    #                 before = parts[0]
+    #                 after = parts[1]
+    #                 # Check if anchor text is provided
+    #                 if '|' in after:
+    #                     anchor_text = after.split('}', 1)[0].split('|')[1]
+    #                     content = before + f'<a href="{newsletter_tracking_url}">{anchor_text}</a>' + after.split('}', 1)[1]
+    #                 else:
+    #                     content = before + f'<a href="{newsletter_tracking_url}">here</a>' + after.split('}', 1)[1]            
 
             
 
-        return content
+    #     return content
 
     def __str__(self):
         if not hasattr(self, 'campaign_lead') or self.campaign_lead is None:
@@ -538,7 +563,7 @@ class MessageAssignment(models.Model):
             # Save again with the link
             kwargs['force_insert'] = False
             super().save(*args, **kwargs)
-            return
+            
         
         # Auto-create a link if one doesn't exist
         if not self.newsletter_link and self.campaign_lead:
@@ -555,7 +580,7 @@ class MessageAssignment(models.Model):
             # Save again with the link
             kwargs['force_insert'] = False
             super().save(*args, **kwargs)
-            return
+            
         
         if not self.personlized_msg_tmp:
             self.personlized_msg_tmp = self.get_personalized_content_tmp() 
