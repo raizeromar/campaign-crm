@@ -1123,6 +1123,10 @@ class MessageAssignmentAdmin(admin.ModelAdmin):
                     # Use the model's save method directly to bypass any custom save logic
                     # that might create additional links
                     self.model.save(message_assignment)
+
+                    if not message_assignment.personlized_msg_tmp:
+                        message_assignment.personlized_msg_tmp = message_assignment.get_personalized_content_tmp()
+                        message_assignment.save(update_fields=['personlized_msg_tmp'])
                     
                     created_count += 1
                 
