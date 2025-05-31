@@ -468,15 +468,35 @@ class MessageAssignment(models.Model):
     def get_personalized_content_tmp(self):
         """Get the personalized message content with tracking URL"""
         content = self.personlized_msg_tmp or self.message.full_content
-        
+
         # Replace CTA placeholder with tracking URL if available
         if self.url:
             tracking_url = self.get_tracking_url()
-            content = content.replace('{ps_url}', tracking_url)
+            # Allow the user to define the anchor text, e.g., {ps_url|Click Here}
+            if '{ps_url' in content:
+                parts = content.split('{ps_url', 1)
+                before = parts[0]
+                after = parts[1]
+                
+                # Check if anchor text is provided
+                if '|' in after:
+                    anchor_text = after.split('}', 1)[0].split('|')[1]
+                    content = before + f'<a href="{tracking_url}">{anchor_text}</a>' + after.split('}', 1)[1]
+                else:
+                    content = before + f'<a href="{tracking_url}">here</a>' + after.split('}', 1)[1]
+
             if self.message.pps:
-                content = content.replace('{pps_url}', tracking_url)
-            
-        
+                if '{pps_url' in content:
+                    parts = content.split('{pps_url', 1)
+                    before = parts[0]
+                    after = parts[1]
+                    # Check if anchor text is provided
+                    if '|' in after:
+                        anchor_text = after.split('}', 1)[0].split('|')[1]
+                        content = before + f'<a href="{tracking_url}">{anchor_text}</a>' + after.split('}', 1)[1]
+                    else:
+                        content = before + f'<a href="{tracking_url}">here</a>' + after.split('}', 1)[1]
+
         return content
 
     def __str__(self):

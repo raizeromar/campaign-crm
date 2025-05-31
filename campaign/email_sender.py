@@ -84,11 +84,8 @@ def format_email_as_html(content):
     Returns:
         str: HTML formatted content
     """
-    # Escape HTML special characters to prevent injection
-    escaped_content = html.escape(content)
-    
     # Replace newlines with HTML line breaks
-    html_content = escaped_content.replace('\n', '<br>')
+    html_content = content.replace('\n', '<br>')
     
     # Wrap in HTML structure
     html_content = f"""
