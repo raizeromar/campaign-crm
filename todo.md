@@ -9,8 +9,6 @@
 ## add a hook for each one, like an email sending to my account using gmail, or notification in the app
 
 
-## make a feture to import leads via django import export 
-
 ## make production and staging and dev envs
 
 ## finnally make copy the admin css and templates edit them, then use them as frontend! 

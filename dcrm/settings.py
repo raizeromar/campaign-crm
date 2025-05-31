@@ -30,9 +30,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_celery_results', 
+    'import_export',
     'website',
     'campaign',
-    'django_celery_results',  # For storing task results
+     # For storing task results
 ]
 
 MIDDLEWARE = [

@@ -16,7 +16,8 @@ from .models import (
 )
 import logging
 from django.conf import settings
-
+from import_export.admin import ImportExportModelAdmin
+from .resources import LeadResource
 
 # Configure logger
 logger = logging.getLogger(__name__)
@@ -96,7 +97,8 @@ class CampaignAdmin(admin.ModelAdmin):
 
 
 @admin.register(Lead)
-class LeadAdmin(admin.ModelAdmin):
+class LeadAdmin(ImportExportModelAdmin):
+    resource_class = LeadResource
     list_display = ('full_name', 'email', 'company_name', 'lead_type', 'source', 'campaign_count')
     list_filter = ('lead_type', 'source', 'created_at')
     search_fields = ('full_name', 'email', 'company_name')
