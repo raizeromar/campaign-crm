@@ -5,8 +5,6 @@
 
 ## responded content foor the lead?
 
-
-## make the tracking url for email newsletter list
 ## change the name of the tracking url to be less susbichous 
 ## add a hook for each one, like an email sending to my account using gmail, or notification in the app
 

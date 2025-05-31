@@ -445,6 +445,7 @@ class MessageAssignment(models.Model):
     message = models.ForeignKey(Message, on_delete=models.CASCADE)
     url = models.ForeignKey(Link, null=True, blank=True, on_delete=models.SET_NULL, related_name='message_assignments')
     
+    newsletter_link = models.ForeignKey(Link, null=True, blank=True, on_delete=models.SET_NULL, related_name='newsletter_message_assignments', help_text="Link for newsletter signup")
 
     personlized_msg_tmp = models.TextField(blank=True)
     personlized_msg_to_send = models.TextField(blank=True)
@@ -457,12 +458,17 @@ class MessageAssignment(models.Model):
     responded = models.BooleanField(default=False)
     responded_content = models.TextField(blank=True)
 
-    def get_tracking_url(self):
-        """Get the tracking URL for this message assignment"""
-        if self.url:
-            redirect_url= self.url.get_redirect_url()
+    def get_tracking_url(self, url_type="product_url"):
+        if url_type == "product_url" and self.url:
+            redirect_url = self.url.get_redirect_url()
             full_url = f"{settings.SITE_URL}{redirect_url}" if hasattr(settings, 'SITE_URL') else redirect_url
             return full_url
+
+        if url_type == "newsletter" and self.newsletter_link:
+            redirect_url = self.newsletter_link.get_redirect_url()
+            full_url = f"{settings.SITE_URL}{redirect_url}" if hasattr(settings, 'SITE_URL') else redirect_url
+            return full_url
+
         return ""
     
     def get_personalized_content_tmp(self):
@@ -471,7 +477,7 @@ class MessageAssignment(models.Model):
 
         # Replace CTA placeholder with tracking URL if available
         if self.url:
-            tracking_url = self.get_tracking_url()
+            product_tracking_url = self.get_tracking_url(url_type="product_url")
             # Allow the user to define the anchor text, e.g., {ps_url|Click Here}
             if '{ps_url' in content:
                 parts = content.split('{ps_url', 1)
@@ -481,10 +487,12 @@ class MessageAssignment(models.Model):
                 # Check if anchor text is provided
                 if '|' in after:
                     anchor_text = after.split('}', 1)[0].split('|')[1]
-                    content = before + f'<a href="{tracking_url}">{anchor_text}</a>' + after.split('}', 1)[1]
+                    content = before + f'<a href="{product_tracking_url}">{anchor_text}</a>' + after.split('}', 1)[1]
                 else:
-                    content = before + f'<a href="{tracking_url}">here</a>' + after.split('}', 1)[1]
+                    content = before + f'<a href="{product_tracking_url}">here</a>' + after.split('}', 1)[1]
 
+        if self.newsletter_link:
+            newsletter_tracking_url = self.get_tracking_url(url_type="newsletter")
             if self.message.pps:
                 if '{pps_url' in content:
                     parts = content.split('{pps_url', 1)
@@ -493,9 +501,11 @@ class MessageAssignment(models.Model):
                     # Check if anchor text is provided
                     if '|' in after:
                         anchor_text = after.split('}', 1)[0].split('|')[1]
-                        content = before + f'<a href="{tracking_url}">{anchor_text}</a>' + after.split('}', 1)[1]
+                        content = before + f'<a href="{newsletter_tracking_url}">{anchor_text}</a>' + after.split('}', 1)[1]
                     else:
-                        content = before + f'<a href="{tracking_url}">here</a>' + after.split('}', 1)[1]
+                        content = before + f'<a href="{newsletter_tracking_url}">here</a>' + after.split('}', 1)[1]            
+
+            
 
         return content
 
@@ -525,6 +535,23 @@ class MessageAssignment(models.Model):
             # Save it to generate unique ref and apply other logic
             link.save()
             self.url = link
+            # Save again with the link
+            kwargs['force_insert'] = False
+            super().save(*args, **kwargs)
+            return
+        
+        # Auto-create a link if one doesn't exist
+        if not self.newsletter_link and self.campaign_lead:
+            # Create a new Link object with proper utm_content using the now-available ID
+            link = Link(
+                campaign=self.campaign_lead.campaign,
+                campaign_lead=self.campaign_lead,
+                url="https://gatara.org/early-adopters-program/",
+                utm_content=f"email_{self.id}"
+            )
+            # Save it to generate unique ref and apply other logic
+            link.save()
+            self.newsletter_link = link
             # Save again with the link
             kwargs['force_insert'] = False
             super().save(*args, **kwargs)
