@@ -1,7 +1,7 @@
 from pathlib import Path
 from environ import Env
 import os
-
+from django.core.management.utils import get_random_secret_key
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -9,18 +9,22 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Initialize environment variables
 env = Env()
 
-Env.read_env(os.path.join(BASE_DIR, '.env'))
+# Explicitly load .env **only in development**
+if os.environ.get("DJANGO_DEBUG", "False") == "True":
+    env.read_env(os.path.join(BASE_DIR, '.env'))
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env('SECRET_KEY', default='django-insecure-jcxge@8cwms-4-$&qia^6p+^8-qwrsw7vey#0e6e326apg3mvo')
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env.bool('DEBUG', default=True)
+DEBUG = env.bool('DEBUG')
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
 
+CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=[])
 
 # Application definition
 
@@ -35,7 +39,6 @@ INSTALLED_APPS = [
     'import_export',
     'website',
     'campaign',
-     # For storing task results
 ]
 
 MIDDLEWARE = [
@@ -73,12 +76,19 @@ WSGI_APPLICATION = 'dcrm.wsgi.application'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    import dj_database_url
+    DATABASES = {
+        'default': dj_database_url.parse(env('DATABASE_URL'))
+    }
+
 
 
 
@@ -106,7 +116,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Damascus'
 
 USE_I18N = True
 
@@ -118,8 +128,14 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+STATICFILES_DIRS= ['static/']
+
 # Add this line:
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+if not DEBUG:
+    MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -159,6 +175,22 @@ LOGGING = {
 SITE_URL = env('SITE_URL')
 
 
+
+
+
+# Add these security settings for production
+SECURE_HSTS_SECONDS = 31536000  # 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+SECURE_SSL_REDIRECT = not DEBUG
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+
+
+
+
+
+
 # Celery settings
 CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND')
 CELERY_BROKER_URL = env('CELERY_BROKER_URL')
@@ -182,4 +214,4 @@ DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL')
 
 # Email and AI rate limits
 EMAIL_RATE_LIMIT_PER_DAY = env.int('EMAIL_RATE_LIMIT_PER_DAY', 50)
-AI_RATE_LIMIT_PER_MINUTE = env.int('AI_RATE_LIMIT_PER_MINUTE', 0)  # Set to 0 for now as requested
+AI_RATE_LIMIT_PER_MINUTE = env.int('AI_RATE_LIMIT_PER_MINUTE', 0)
