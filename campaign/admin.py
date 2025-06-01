@@ -12,7 +12,8 @@ from urllib.parse import unquote
 from campaign.email_sender import send_campaign_email
 from .models import (
     Product, Campaign, Lead, NewsletterSubscriber,
-    CampaignLead, Message, Link, MessageAssignment, CampaignStats
+    CampaignLead, Message, Link, MessageAssignment, CampaignStats, 
+    SubscribedCompany, Plan, Subscription, BillingHistory, CustomUser
 )
 import logging
 from django.conf import settings
@@ -21,6 +22,48 @@ from .resources import LeadResource
 
 # Configure logger
 logger = logging.getLogger(__name__)
+
+
+
+
+
+
+@admin.register(SubscribedCompany)
+class SubscribedCompanyAdmin(admin.ModelAdmin):
+    list_display = ('name', 'website', 'employee_count', 'location')
+    search_fields = ('name', 'website')
+    list_filter = ('employee_count', 'location',)
+
+
+
+@admin.register(Plan)
+class PlanAdmin(admin.ModelAdmin):
+    list_display = ('name', 'price', 'billing_cycle')
+
+
+
+@admin.register(CustomUser)
+class CustomUserAdmin(admin.ModelAdmin):
+    list_display = ('username', 'email', 'subscribed_company')
+    search_fields = ('email', 'username', 'first_name', 'last_name')
+    list_filter = ('subscribed_company',)
+    
+
+
+admin.site.register(Subscription)
+admin.site.register(BillingHistory)
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Inline models for related objects
 class CampaignLeadInline(admin.TabularInline):
@@ -103,6 +146,9 @@ class LeadAdmin(ImportExportModelAdmin):
     list_filter = ('lead_type', 'source', 'created_at')
     search_fields = ('full_name', 'email', 'company_name')
     fieldsets = (
+        ('Owned By', {
+            'fields': ('subscribed_company',)
+        }),
         ('Personal Information', {
             'fields': ('full_name', 'first_name', 'last_name', 'position', 'email', 'phone_number', 'linkedin_profile')
         }),

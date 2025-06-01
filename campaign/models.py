@@ -5,9 +5,128 @@ from urllib.parse import urlparse, urlunparse, parse_qs, urlencode
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.conf import settings
+from django.contrib.auth.models import AbstractUser, Group, Permission
 import re
 
+
+
+class SubscribedCompany(models.Model):
+    name = models.CharField(max_length=255)
+    website = models.URLField(unique=True)
+    email= models.EmailField(unique=True)
+    industry = models.CharField(max_length=100)
+    employee_count = models.CharField(max_length=50)
+    linkedin_page= models.URLField(blank=True)
+    location= models.CharField(max_length=255)
+
+    manager_full_name = models.CharField(max_length=255, blank=True)
+    manager_position = models.CharField(max_length=100, blank=True, help_text="ex: founder, cofounder...")
+    manager_email = models.EmailField(unique=True, blank=True, null=True)
+    manager_phone_number = models.CharField(max_length=20, blank=True)
+    manager_linkedin_profile = models.URLField(unique=True, blank=True, null=True)
+
+
+    def __str__(self):
+        return f"{self.name}"
+
+
+
+class Plan(models.Model):
+    name = models.CharField(max_length=100)
+    slug = models.SlugField(unique=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    billing_cycle = models.CharField(max_length=20, choices=[
+        ('monthly', 'Monthly'),
+        ('annual', 'Annual')
+    ])
+    
+    def __str__(self):
+        return f"{self.name} (${self.price}/{self.billing_cycle})"
+
+
+
+
+class Subscription(models.Model): 
+    STATUS_CHOICES = [
+        ('active', 'Active'),
+        ('trial', 'Trial'),
+        ('past_due', 'Past Due'),
+        ('canceled', 'Canceled'),
+        ('expired', 'Expired'),
+    ]
+    
+    subscribed_company = models.ForeignKey(SubscribedCompany, on_delete=models.CASCADE, related_name='subscriptions')
+    plan = models.ForeignKey(Plan, on_delete=models.PROTECT, related_name='subscriptions')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='trial')
+    start_date = models.DateTimeField(auto_now_add=True)
+    trial_end_date = models.DateTimeField(null=True, blank=True)
+    current_period_end = models.DateTimeField(null=True, blank=True)
+    canceled_at = models.DateTimeField(null=True, blank=True)
+    
+    
+    # Billing information
+    billing_email = models.EmailField()
+    payment_method_id = models.CharField(max_length=255, blank=True)
+    
+    
+    def __str__(self):
+        return f"{self.subscribed_company.name}-{self.plan.name}-{self.id}"
+
+
+
+
+
+
+
+
+class BillingHistory(models.Model):
+    subscribed_company = models.ForeignKey(SubscribedCompany, on_delete=models.CASCADE, related_name='billing_history')
+    subscription = models.ForeignKey(Subscription, on_delete=models.CASCADE)
+    date = models.DateTimeField(auto_now_add=True)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    description = models.CharField(max_length=255)
+    invoice_id = models.CharField(max_length=255, blank=True)
+    payment_method = models.CharField(max_length=50, blank=True)
+    status = models.CharField(max_length=20, choices=[
+        ('paid', 'Paid'),
+        ('failed', 'Failed'),
+        ('refunded', 'Refunded')
+    ])
+    
+    class Meta:
+        verbose_name_plural = "Billing Histories"
+    
+    def __str__(self):
+        return f"{self.amount}-{self.status}-{self.subscribed_company}"
+
+
+
+class CustomUser(AbstractUser):
+    subscribed_company = models.ForeignKey(SubscribedCompany, on_delete=models.CASCADE, related_name='users')
+    
+    # Fix group conflicts
+    groups = models.ManyToManyField(
+        Group,
+        related_name='custom_user_set',
+        blank=True,
+        help_text='The groups this user belongs to.',
+        verbose_name='groups'
+    )
+    user_permissions = models.ManyToManyField(
+        Permission,
+        related_name='custom_user_set',
+        blank=True,
+        help_text='Specific permissions for this user.',
+        verbose_name='user permissions'
+    )
+
+
+
+
+
 class Product(models.Model):
+    subscribed_company = models.ForeignKey(SubscribedCompany, on_delete=models.CASCADE)
+
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     landing_page_url = models.URLField(blank=True)
@@ -65,6 +184,8 @@ class Product(models.Model):
 
 
 class Campaign(models.Model):
+    subscribed_company = models.ForeignKey(SubscribedCompany, on_delete=models.CASCADE)
+
     name = models.CharField(max_length=255)
     short_name = models.SlugField(unique=True, blank=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -109,6 +230,8 @@ class Campaign(models.Model):
 
 
 class Lead(models.Model):
+    subscribed_company = models.ForeignKey(SubscribedCompany, on_delete=models.CASCADE)
+
     full_name = models.CharField(max_length=255)
     first_name = models.CharField(max_length=100, blank=True)
     last_name = models.CharField(max_length=100, blank=True)
@@ -191,6 +314,7 @@ class NewsletterSubscriber(models.Model):
 
 
 class CampaignLead(models.Model):
+
     campaign = models.ForeignKey(Campaign, on_delete=models.CASCADE)
     lead = models.ForeignKey(Lead, on_delete=models.CASCADE)
 

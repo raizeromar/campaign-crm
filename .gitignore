@@ -59,3 +59,7 @@ coverage.xml
 
 # nginx
 nginx/
+
+# Ignore all files in migrations folders except __init__.py
+migrations/
+!migrations/__init__.py
