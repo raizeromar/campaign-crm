@@ -56,3 +56,6 @@ coverage.xml
 
 # Docker
 *.pid
+
+# nginx
+nginx/
