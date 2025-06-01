@@ -46,9 +46,13 @@ Thumbs.db
 .env
 .env.local
 .env.*.local
+.env.production
 
 # Coverage
 htmlcov/
 .coverage
 .coverage.*
 coverage.xml
+
+# Docker
+*.pid
